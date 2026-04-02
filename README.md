@@ -2,18 +2,18 @@
 
 基于 **.NET Framework 4.7.2** 的 SQLite 数据库交互示例项目，采用 **Dapper + System.Data.SQLite** 构建轻量级数据访问层（DAL），支持多数据库连接、批量操作、数据导出/导入、多线程安全和异步操作。
 
----
+***
 
 ## 技术栈
 
-| 技术/包 | 版本 | 说明 |
-| :--- | :--- | :--- |
-| .NET Framework | 4.7.2 | 目标运行框架 |
+| 技术/包                    | 版本      | 说明                |
+| :---------------------- | :------ | :---------------- |
+| .NET Framework          | 4.7.2   | 目标运行框架            |
 | System.Data.SQLite.Core | 1.0.118 | SQLite ADO.NET 驱动 |
-| Dapper | 2.1.28 | 轻量级 ORM，简化对象映射 |
-| Newtonsoft.Json | 13.0.3 | JSON 序列化/反序列化 |
+| Dapper                  | 2.1.28  | 轻量级 ORM，简化对象映射    |
+| Newtonsoft.Json         | 13.0.3  | JSON 序列化/反序列化     |
 
----
+***
 
 ## 项目结构
 
@@ -43,7 +43,7 @@ SqlDemo/
     └── Program.cs           # 控制台入口
 ```
 
----
+***
 
 ## 快速开始
 
@@ -67,7 +67,7 @@ dotnet run
 
 > 首次运行后，会在项目根目录自动生成 `main.db`、`logs.db`、`archive.db` 数据库文件。
 
----
+***
 
 ## 架构说明
 
@@ -136,7 +136,6 @@ dotnet run
 - **UserRepository**：用户业务仓储
   - `SearchByName(string keyword)`：按用户名模糊查询
   - `GetActiveUsers()`：获取所有活跃用户
-
 - **LogRepository**：日志业务仓储
   - `GetByLevel(string level)` / `GetByLevelAsync(string level)`：按级别查询日志
   - `GetRecentLogs(int count)` / `GetRecentLogsAsync(int count)`：查询最近的日志
@@ -156,14 +155,13 @@ dotnet run
 - **SqliteDbContext**：提供数据库备份方法
   - `BackupDatabase(string backupPath)`：备份数据库到指定路径
   - `BackupDatabaseAsync(string backupPath)`：异步备份数据库到指定路径
-
 - **DatabaseFactory**：提供数据库备份静态方法
   - `BackupDatabase(string configName, string backupPath)`：备份指定数据库
   - `BackupDatabaseAsync(string configName, string backupPath)`：异步备份指定数据库
   - `BackupAllDatabases(string backupDirectory)`：备份所有注册的数据库
   - `BackupAllDatabasesAsync(string backupDirectory)`：异步备份所有注册的数据库
 
----
+***
 
 ## 使用示例
 
@@ -344,7 +342,7 @@ using (var db = new SqliteDbContext("demo.db"))
 }
 ```
 
----
+***
 
 ## 扩展指南
 
@@ -392,16 +390,16 @@ public class OrderRepository : RepositoryBase<Order>
    [Field("电话", "联系信息", ControlType.String)]
    public string Phone { get; set; }
    ```
-
 2. **运行程序**：程序会自动检测并添加新列到数据库表中。
 
 系统会自动：
+
 - 检测数据库表中已存在的列
 - 对比实体类的所有公共属性
 - 自动添加缺失的列
 - 根据属性类型自动选择合适的 SQLite 数据类型（TEXT、INTEGER、REAL、BLOB）
 
----
+***
 
 ## 注意事项
 
@@ -415,7 +413,7 @@ public class OrderRepository : RepositoryBase<Order>
 8. **异步操作**：异步操作使用 `async/await` 模式，需要在调用方法上添加 `async` 修饰符。
 9. **密码连接**：SQLite 加密功能需要 SQLite Encryption Extension (SEE) 支持，标准 System.Data.SQLite.Core 不包含此功能。
 
----
+***
 
 ## 作者
 
