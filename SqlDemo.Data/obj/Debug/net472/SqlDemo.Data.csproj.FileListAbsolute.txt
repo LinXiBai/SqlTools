@@ -1,0 +1,13 @@
+E:\公司\项目\SqlDemo\SqlDemo.Data\bin\Debug\net472\SqlDemo.Data.dll
+E:\公司\项目\SqlDemo\SqlDemo.Data\bin\Debug\net472\SqlDemo.Data.pdb
+E:\公司\项目\SqlDemo\SqlDemo.Data\bin\Debug\net472\Dapper.dll
+E:\公司\项目\SqlDemo\SqlDemo.Data\bin\Debug\net472\Newtonsoft.Json.dll
+E:\公司\项目\SqlDemo\SqlDemo.Data\bin\Debug\net472\System.Data.SQLite.dll
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.csproj.AssemblyReference.cache
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.GeneratedMSBuildEditorConfig.editorconfig
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.AssemblyInfoInputs.cache
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.AssemblyInfo.cs
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.csproj.CoreCompileInputs.cache
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo..D189D967.Up2Date
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.dll
+E:\公司\项目\SqlDemo\SqlDemo.Data\obj\Debug\net472\SqlDemo.Data.pdb

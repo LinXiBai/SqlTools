@@ -1,0 +1,13 @@
+{
+  "version": 2,
+  "dgSpecHash": "bD4HsJ8dUHc=",
+  "success": true,
+  "projectFilePath": "E:\\公司\\项目\\SqlDemo\\SqlDemo.Data\\SqlDemo.Data.csproj",
+  "expectedPackageFiles": [
+    "E:\\Administrator\\.nuget\\packages\\dapper\\2.1.28\\dapper.2.1.28.nupkg.sha512",
+    "E:\\Administrator\\.nuget\\packages\\newtonsoft.json\\13.0.3\\newtonsoft.json.13.0.3.nupkg.sha512",
+    "E:\\Administrator\\.nuget\\packages\\stub.system.data.sqlite.core.netframework\\1.0.118\\stub.system.data.sqlite.core.netframework.1.0.118.nupkg.sha512",
+    "E:\\Administrator\\.nuget\\packages\\system.data.sqlite.core\\1.0.118\\system.data.sqlite.core.1.0.118.nupkg.sha512"
+  ],
+  "logs": []
+}

@@ -1,0 +1,14 @@
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\SqlDemo.Tests.exe.config
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\SqlDemo.Tests.exe
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\SqlDemo.Tests.pdb
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\Dapper.dll
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\Newtonsoft.Json.dll
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\System.Data.SQLite.dll
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\SqlDemo.Data.dll
+E:\公司\项目\SqlDemo\SqlDemo.Tests\bin\Debug\net472\SqlDemo.Data.pdb
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo.Tests.csproj.AssemblyReference.cache
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo.Tests.GeneratedMSBuildEditorConfig.editorconfig
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo.Tests.csproj.CoreCompileInputs.cache
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo..0DFFDA8D.Up2Date
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo.Tests.exe
+E:\公司\项目\SqlDemo\SqlDemo.Tests\obj\Debug\net472\SqlDemo.Tests.pdb

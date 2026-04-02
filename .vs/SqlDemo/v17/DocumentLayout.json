@@ -1,0 +1,134 @@
+{
+  "Version": 1,
+  "WorkspaceRootPath": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\",
+  "Documents": [
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\sqlitedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\sqlitedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\logrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\logrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    }
+  ],
+  "DocumentGroupContainers": [
+    {
+      "Orientation": 0,
+      "VerticalTabListWidth": 256,
+      "DocumentGroups": [
+        {
+          "DockedWidth": 200,
+          "SelectedChildIndex": 0,
+          "Children": [
+            {
+              "$type": "Document",
+              "DocumentIndex": 0,
+              "Title": "EntityBase.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\EntityBase.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\EntityBase.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\EntityBase.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Models\\EntityBase.cs",
+              "ViewState": "AQIAABMAAAAAAAAAAAAQwDUAAAAXAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:03:00.411Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 1,
+              "Title": "Attributes.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\Attributes.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\Attributes.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\Attributes.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Models\\Attributes.cs",
+              "ViewState": "AQIAAAQAAAAAAAAAAAAMwDEAAAAPAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:02:49.602Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
+            },
+            {
+              "$type": "Bookmark",
+              "Name": "ST:128:0:{116d2292-e37d-41cd-a077-ebacac4c8cc4}"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
+              "Title": "User.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\User.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\User.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\User.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Models\\User.cs",
+              "ViewState": "AQIAAAgAAAAAAAAAAAAAwA4AAAALAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:02:36.968Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 3,
+              "Title": "SqliteDbContext.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\SqliteDbContext.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\SqliteDbContext.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\SqliteDbContext.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Data\\SqliteDbContext.cs",
+              "ViewState": "AQIAAF0AAAAAAAAAAAAowAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:02:26.262Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 4,
+              "Title": "RepositoryBase.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\RepositoryBase.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\RepositoryBase.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\RepositoryBase.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Data\\RepositoryBase.cs",
+              "ViewState": "AQIAAAAAAAAAAAAAAAAAAAAAAAAAAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:02:23.759Z",
+              "EditorCaption": ""
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 5,
+              "Title": "LogRepository.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\LogRepository.cs",
+              "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\LogRepository.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\LogRepository.cs",
+              "RelativeToolTip": "SqlDemo.Data\\Data\\LogRepository.cs",
+              "ViewState": "AQIAAB0BAAAAAAAAAAAIwBgAAAAVAAAA",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-02T10:01:49.521Z",
+              "EditorCaption": ""
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
