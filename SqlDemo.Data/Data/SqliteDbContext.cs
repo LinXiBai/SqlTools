@@ -212,6 +212,70 @@ namespace SqlDemo.Data
             // 初始化所有数据表
             InitUsersTable();
             InitLogsTable();
+            InitAxisParametersTable();
+            InitIOParametersTable();
+        }
+
+        /// <summary>初始化轴参数表</summary>
+        private void InitAxisParametersTable()
+        {
+            // 创建表（如果不存在）
+            string createTableSql = @"
+                CREATE TABLE IF NOT EXISTS AxisParameters (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    轴名称 TEXT NOT NULL,
+                    轴号 INTEGER NOT NULL,
+                    卡号 INTEGER NOT NULL,
+                    轴类型 INTEGER DEFAULT 0,
+                    脉冲当量 INTEGER DEFAULT 1,
+                    脉冲当量分母 INTEGER DEFAULT 1,
+                    运动低速 REAL DEFAULT 0,
+                    运动高速 REAL DEFAULT 0,
+                    加速度 REAL DEFAULT 0,
+                    减速度 REAL DEFAULT 0,
+                    加加速度 REAL DEFAULT 0,
+                    减减速度 REAL DEFAULT 0,
+                    回原模式 INTEGER DEFAULT 0,
+                    回原方向 INTEGER DEFAULT 0,
+                    原点高速 REAL DEFAULT 0,
+                    原点低速 REAL DEFAULT 0,
+                    原点加速度 REAL DEFAULT 0,
+                    原点减速度 REAL DEFAULT 0,
+                    原点偏移 REAL DEFAULT 0,
+                    正向软极限 REAL DEFAULT 0,
+                    负向软极限 REAL DEFAULT 0,
+                    使能IO INTEGER DEFAULT 0,
+                    CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+                    UpdatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            Execute(createTableSql);
+
+            // 自动检测并添加新列
+            AutoAddMissingColumns<AxisParameter>("AxisParameters");
+        }
+
+        /// <summary>初始化IO参数表</summary>
+        private void InitIOParametersTable()
+        {
+            // 创建表（如果不存在）
+            string createTableSql = @"
+                CREATE TABLE IF NOT EXISTS IOParameters (
+                    ID INTEGER PRIMARY KEY AUTOINCREMENT,
+                    卡号 INTEGER NOT NULL,
+                    端口号 INTEGER NOT NULL,
+                    输入点 INTEGER DEFAULT 0,
+                    输入名称 TEXT,
+                    输出点 INTEGER DEFAULT 0,
+                    输出名称 TEXT,
+                    CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+                    UpdatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            Execute(createTableSql);
+
+            // 自动检测并添加新列
+            AutoAddMissingColumns<IOParameter>("IOParameters");
         }
 
         /// <summary>初始化用户表</summary>

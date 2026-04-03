@@ -7,6 +7,7 @@ E:\公司\项目\SqlDemo\bin\Debug\net472\System.Data.SQLite.dll
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.csproj.AssemblyReference.cache
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.GeneratedMSBuildEditorConfig.editorconfig
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.csproj.CoreCompileInputs.cache
+E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.sourcelink.json
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.csproj.Up2Date
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.exe
 E:\公司\项目\SqlDemo\obj\Debug\net472\SqlDemo.pdb

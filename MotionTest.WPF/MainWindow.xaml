@@ -1,0 +1,100 @@
+<Window x:Class="MotionTest.WPF.MainWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        Title="研华运动控制卡测试程序" Height="700" Width="1000"
+        WindowStartupLocation="CenterScreen">
+    <Grid>
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="200"/>
+        </Grid.RowDefinitions>
+
+        <!-- 标题 -->
+        <Border Grid.Row="0" Background="#FF2D2D30" Padding="10">
+            <TextBlock x:Name="txtTitle" Text="研华运动控制卡测试" 
+                       Foreground="White" FontSize="20" FontWeight="Bold"/>
+        </Border>
+
+        <!-- 控制卡操作 -->
+        <Border Grid.Row="1" Background="#FFF0F0F0" Padding="10" Margin="5">
+            <StackPanel Orientation="Horizontal">
+                <TextBlock Text="卡类型:" VerticalAlignment="Center" Margin="0,0,5,0"/>
+                <ComboBox x:Name="cmbCardType" Width="120" SelectedIndex="0">
+                    <ComboBoxItem>PCI-1285</ComboBoxItem>
+                    <ComboBoxItem>PCI-1203 (16轴)</ComboBoxItem>
+                    <ComboBoxItem>PCI-1203 (32轴)</ComboBoxItem>
+                </ComboBox>
+                <TextBlock Text="卡号:" VerticalAlignment="Center" Margin="10,0,5,0"/>
+                <ComboBox x:Name="cmbCardId" Width="60" SelectedIndex="0">
+                    <ComboBoxItem>0</ComboBoxItem>
+                    <ComboBoxItem>1</ComboBoxItem>
+                    <ComboBoxItem>2</ComboBoxItem>
+                </ComboBox>
+                <Button x:Name="btnInit" Content="初始化" Width="80" Margin="10,0,5,0" Click="btnInit_Click"/>
+                <Button x:Name="btnOpen" Content="打开" Width="80" Margin="5,0,5,0" Click="btnOpen_Click" IsEnabled="False"/>
+                <Button x:Name="btnClose" Content="关闭" Width="80" Margin="5,0,5,0" Click="btnClose_Click" IsEnabled="False"/>
+                <Button x:Name="btnReset" Content="复位" Width="80" Margin="5,0,5,0" Click="btnReset_Click" IsEnabled="False"/>
+                <Button x:Name="btnDatabase" Content="数据库管理" Width="100" Margin="5,0,5,0" Click="btnDatabase_Click"/>
+                <TextBlock x:Name="txtStatus" Text="状态: 未初始化" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold"/>
+            </StackPanel>
+        </Border>
+
+        <!-- 轴控制区域 -->
+        <TabControl Grid.Row="2" Margin="5">
+            <TabItem Header="轴控制">
+                <ScrollViewer VerticalScrollBarVisibility="Auto">
+                    <StackPanel x:Name="spAxes">
+                        <!-- 动态生成轴的控制界面 -->
+                    </StackPanel>
+                </ScrollViewer>
+            </TabItem>
+            <TabItem Header="IO控制">
+                <Grid>
+                    <Grid.ColumnDefinitions>
+                        <ColumnDefinition Width="*"/>
+                        <ColumnDefinition Width="*"/>
+                    </Grid.ColumnDefinitions>
+                    
+                    <!-- 输入 -->
+                    <Border Grid.Column="0" Background="#FFE8F5E9" Padding="10" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="数字输入 (DI)" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                            <UniformGrid x:Name="ugInputs" Columns="8">
+                                <!-- 动态生成输入指示灯 -->
+                            </UniformGrid>
+                            <Button x:Name="btnRefreshInputs" Content="刷新输入" Width="100" Margin="0,10,0,0" HorizontalAlignment="Left" Click="btnRefreshInputs_Click"/>
+                        </StackPanel>
+                    </Border>
+                    
+                    <!-- 输出 -->
+                    <Border Grid.Column="1" Background="#FFFFEBEE" Padding="10" Margin="5">
+                        <StackPanel>
+                            <TextBlock Text="数字输出 (DO)" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
+                            <UniformGrid x:Name="ugOutputs" Columns="8">
+                                <!-- 动态生成输出按钮 -->
+                            </UniformGrid>
+                            <Button x:Name="btnSetAllOutputs" Content="全部置位" Width="100" Margin="0,10,5,0" HorizontalAlignment="Left" Click="btnSetAllOutputs_Click"/>
+                            <Button x:Name="btnResetAllOutputs" Content="全部复位" Width="100" Margin="0,5,0,0" HorizontalAlignment="Left" Click="btnResetAllOutputs_Click"/>
+                        </StackPanel>
+                    </Border>
+                </Grid>
+            </TabItem>
+        </TabControl>
+
+        <!-- 日志区域 -->
+        <Border Grid.Row="3" Background="#FF1E1E1E" Padding="5" Margin="5">
+            <Grid>
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                </Grid.RowDefinitions>
+                <TextBlock Text="日志:" Foreground="White" FontWeight="Bold" Margin="0,0,0,5"/>
+                <TextBox x:Name="txtLog" Grid.Row="1" Background="#FF1E1E1E" Foreground="#FF00FF00" 
+                         FontFamily="Consolas" FontSize="12" IsReadOnly="True" 
+                         VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+            </Grid>
+        </Border>
+    </Grid>
+</Window>
