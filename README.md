@@ -139,6 +139,22 @@ SqlDemo/
 │   │   │   └── IniHelper.cs             # INI 读写
 │   │   └── Models/
 │   │       └── Recipe.cs                # 配方模型
+│   ├── StateMachine/                    # 状态机流程引擎
+│   │   ├── Core/
+│   │   │   ├── IFlowModule.cs           # 流程模块接口
+│   │   │   ├── FlowModuleBase.cs        # 流程模块基类
+│   │   │   ├── StateMachineManager.cs   # 状态机管理器
+│   │   │   └── StateMachine.cs          # 状态机
+│   │   ├── Modules/
+│   │   │   ├── ContainerModules.cs      # 容器模块（顺序/并行/条件/循环）
+│   │   │   ├── MotionModules.cs         # 运动相关模块
+│   │   │   ├── IOModules.cs             # IO相关模块
+│   │   │   └── ActionModules.cs         # 自定义动作模块
+│   │   ├── Monitors/
+│   │   │   ├── InPositionDetector.cs    # 到位检测
+│   │   │   └── TrajectoryRecorder.cs    # 轨迹记录
+│   │   └── Models/
+│   │       ├── StateMachineModels.cs     # 状态机模型
 │   └── Algorithm/                       # 算法层
 │       ├── Helpers/
 │       │   ├── GeometryHelper.cs        # 几何计算（旋转、交点、圆心）
@@ -353,6 +369,42 @@ dotnet run --project MotionTest.WPF
 **补偿算法 `CompensationHelper`**
 - `LinearCompensate`：一维线性补偿（常用于单轴补偿表）
 - `BilinearCompensate`：双线性插值补偿（常用于平面精度补偿）
+
+#### 9. 状态机流程引擎 `CoreToolkit.StateMachine`
+
+**核心组件**
+- `StateMachineManager`：管理多个状态机的生命周期和执行
+- `StateMachine`：表示一个独立的设备流程
+- `IFlowModule`：流程模块接口
+- `FlowModuleBase`：所有模块的基类，提供状态管理、超时检测、统计等通用功能
+
+**容器模块**
+| 模块 | 说明 |
+|------|------|
+| `SequentialModule` | 顺序执行子模块 |
+| `ParallelModule` | 并行执行子模块，任一失败立即取消其他 |
+| `ConditionalModule` | 条件执行（满足条件才执行子模块） |
+| `LoopModule` | 循环执行（固定次数或条件满足） |
+
+**功能模块**
+| 模块 | 说明 |
+|------|------|
+| `AxisMoveModule` | 轴运动（绝对/相对，支持多轴同时运动） |
+| `IOOutputModule` | IO 输出（设置输出状态，支持反馈检测） |
+| `IOInputModule` | IO 输入（等待输入状态，支持稳定时间检测） |
+| `CustomActionModule` | 自定义动作（执行任意代码） |
+| `CompositeIOModule` | 复合 IO 操作（等待所有输入满足/任一输入满足） |
+
+**监控器**
+- `InPositionDetector`：轴到位检测（位置稳定判断）
+- `TrajectoryRecorder`：运动轨迹记录（采样位置/速度/状态）
+
+**关键特性**
+- **事件系统**：状态变更、模块执行、完成、超时等事件
+- **超时检测**：精确的超时控制和区分（用户取消 vs 超时）
+- **统计功能**：成功率、执行时间、错误信息等
+- **并行优化**：支持多模块并行执行，提升效率
+- **资源安全**：完整的 IDisposable 实现，避免资源泄漏
 
 ### 二、CoreToolkit.Desktop（WPF MVVM 辅助库）
 
@@ -569,6 +621,121 @@ var trackOut = MesHelper.BuildTrackOutFromPlacement("WO20250404001", "SN12345678
 var trackOutResult = mes.TrackOut(trackOut);
 ```
 
+### 状态机流程
+
+```csharp
+using CoreToolkit.StateMachine.Core;
+using CoreToolkit.StateMachine.Modules;
+using CoreToolkit.StateMachine.Models;
+
+// 创建状态机管理器
+var manager = new StateMachineManager();
+
+// 创建状态机
+var machine = manager.CreateMachine("AssemblyProcess", "组装流程");
+
+// 创建根模块（顺序执行）
+var rootModule = new SequentialModule("AssemblyRoot");
+machine.SetRootModule(rootModule);
+
+// 流程 A: 上基板
+var flowA = new SequentialModule("FlowA_上基板");
+
+// 1. 移动到上料位置
+var moveToLoad = new AxisMoveModule(motionCard, "移动到上料位置")
+{
+    AxisIndices = new int[] { 0, 1 },
+    TargetPositions = new double[] { 1000, 500 },
+    Velocities = new double[] { 5000, 5000 },
+    IsAbsolute = true
+};
+flowA.AddModule(moveToLoad);
+
+// 2. 打开基板夹具
+var openClamp = new IOOutputModule(ioCard, "打开基板夹具")
+{
+    IoIndex = 0,
+    OutputState = true,
+    DelayAfterSetMs = 500
+};
+flowA.AddModule(openClamp);
+
+// 3. 等待基板到位
+var waitBoard = new IOInputModule(ioCard, "等待基板到位")
+{
+    IoIndex = 1,
+    ExpectedState = true,
+    TimeoutMs = 10000
+};
+flowA.AddModule(waitBoard);
+
+// 4. 关闭基板夹具
+var closeClamp = new IOOutputModule(ioCard, "关闭基板夹具")
+{
+    IoIndex = 0,
+    OutputState = false,
+    DelayAfterSetMs = 500
+};
+flowA.AddModule(closeClamp);
+
+// 5. 移动到组装位置
+var moveToAssembly = new AxisMoveModule(motionCard, "移动到组装位置")
+{
+    AxisIndices = new int[] { 0, 1 },
+    TargetPositions = new double[] { 2000, 1000 },
+    Velocities = new double[] { 5000, 5000 },
+    IsAbsolute = true
+};
+flowA.AddModule(moveToAssembly);
+
+// 流程 B: 取芯片 A1
+var flowB = new SequentialModule("FlowB_取芯片A1");
+// ... 类似步骤
+
+// 流程 C: 取芯片 B1
+var flowC = new SequentialModule("FlowC_取芯片B1");
+// ... 类似步骤
+
+// 并行执行 取芯片A1 和 取芯片B1
+var parallelModule = new ParallelModule("并行取芯片");
+parallelModule.AddModule(flowB); // 取芯片A1
+parallelModule.AddModule(flowC); // 取芯片B1
+
+// 组装步骤
+var assemblySteps = new SequentialModule("组装步骤");
+// ... 组装相关步骤
+
+// 构建完整流程
+rootModule.AddModule(flowA);         // 上基板
+rootModule.AddModule(parallelModule); // 并行取芯片
+rootModule.AddModule(assemblySteps);  // 组装
+
+// 订阅事件
+machine.OnStatusChanged += (s, e) =>
+{
+    Console.WriteLine($"状态机 '{e.MachineName}' 状态: {e.OldStatus} → {e.NewStatus}");
+};
+
+machine.OnModuleExecuting += (s, e) =>
+{
+    Console.WriteLine($"执行模块: {e.ModuleName} ({e.ModuleId})");
+};
+
+machine.OnModuleCompleted += (s, e) =>
+{
+    Console.WriteLine($"模块完成: {e.ModuleName} → {e.NewStatus} (耗时: {e.DurationMs:F1}ms)");
+};
+
+// 启动状态机
+var context = new ExecutionContext();
+var success = await manager.StartMachineAsync("AssemblyProcess", context);
+
+// 获取统计信息
+var stats = manager.GetStatistics("AssemblyProcess");
+Console.WriteLine($"总耗时: {stats.TotalDuration.TotalSeconds:F2}秒");
+Console.WriteLine($"成功率: {(stats.IsSuccess ? "100%" : "0%")}");
+```
+
 ### WPF MVVM
 
 ```csharp
@@ -688,6 +855,62 @@ var retryResult = RetryHelper.Execute(() => ReadSensorData(), retryCount: 3, del
 2. 在 `CoreToolkit/MES/Core/IMesClient.cs` 中增加方法签名
 3. 在 `MesHttpClient` 中实现对应的 HTTP 调用逻辑
 4. 如果 MES 采用 WebService / MQ 等其他协议，可新建 `MesSoapClient` / `MesMqClient` 并同样实现 `IMesClient`
+
+### 扩展状态机功能
+
+**新增自定义模块**
+1. 在 `CoreToolkit/StateMachine/Modules` 下新建模块类，继承 `FlowModuleBase`
+2. 实现 `ExecuteInternalAsync` 方法
+3. 添加必要的属性和配置
+
+**示例：自定义检测模块**
+```csharp
+public class VisionInspectionModule : FlowModuleBase
+{
+    private readonly ICamera _camera;
+    
+    public string PatternName { get; set; }
+    public double MinScore { get; set; } = 0.8;
+    
+    public VisionInspectionModule(ICamera camera, string name) : base(name)
+    {
+        _camera = camera;
+    }
+    
+    protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken token)
+    {
+        // 1. 拍照
+        var image = _camera.Capture();
+        
+        // 2. 模板匹配
+        var result = _camera.MatchTemplate(PatternName);
+        
+        // 3. 判断结果
+        if (result.Score >= MinScore)
+        {
+            // 匹配成功，记录坐标
+            context.SetData("MatchX", result.X);
+            context.SetData("MatchY", result.Y);
+            return true;
+        }
+        else
+        {
+            Statistics.ErrorMessage = $"模板匹配失败，分数: {result.Score}";
+            return false;
+        }
+    }
+}
+```
+
+**新增容器模块**
+1. 继承 `FlowModuleBase`
+2. 实现子模块管理逻辑
+3. 重写 `AddModule` 方法
+
+**扩展监控器**
+1. 在 `CoreToolkit/StateMachine/Monitors` 下新建监控器类
+2. 实现相应的检测或记录逻辑
+3. 在模块执行过程中使用
 
 ### 配方管理示例
 

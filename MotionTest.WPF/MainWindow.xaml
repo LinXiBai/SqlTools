@@ -138,6 +138,16 @@
                             <Button x:Name="ViewLogsBtn" Content="查看日志" Margin="0,2" Click="ViewLogsBtn_Click"/>
                         </StackPanel>
                     </GroupBox>
+                    
+                    <!-- 流程控制 -->
+                    <GroupBox Grid.Row="4" Header="流程控制与轨迹" Margin="5">
+                        <StackPanel Margin="5">
+                            <Button x:Name="FlowControlBtn" Content="打开流程控制窗口" Margin="0,2" 
+                                    Click="FlowControlBtn_Click" Background="#FF4CAF50" Foreground="White"/>
+                            <TextBlock Text="测试PTP/PVT/插补" FontSize="10" Foreground="Gray" 
+                                       HorizontalAlignment="Center" Margin="0,2"/>
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
             </Border>
             

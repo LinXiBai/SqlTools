@@ -1,5 +1,6 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.ComponentModel;
 using System.Threading;
 using System.Threading.Tasks;
 using System.Windows;
@@ -257,6 +258,9 @@ namespace MotionTest.WPF
                 int axis = AxisCombo.SelectedIndex;
                 _motionCard.SetServoEnable(axis, true);
                 LogMessage($"轴{axis} 伺服ON");
+                
+                // 立即刷新该轴状态
+                RefreshAxisStatus(axis);
             }
             catch (Exception ex)
             {
@@ -276,6 +280,9 @@ namespace MotionTest.WPF
                 int axis = AxisCombo.SelectedIndex;
                 _motionCard.SetServoEnable(axis, false);
                 LogMessage($"轴{axis} 伺服OFF");
+                
+                // 立即刷新该轴状态
+                RefreshAxisStatus(axis);
             }
             catch (Exception ex)
             {
@@ -622,6 +629,23 @@ namespace MotionTest.WPF
         }
 
         /// <summary>
+        /// 打开流程控制窗口
+        /// </summary>
+        private void FlowControlBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var flowWindow = new FlowControlWindow();
+                flowWindow.Show();
+                LogMessage("打开流程控制窗口");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"打开流程控制窗口失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
         /// 初始化默认参数
         /// </summary>
         private void InitializeDefaultParameters(int cardId)
@@ -778,19 +802,105 @@ namespace MotionTest.WPF
     /// <summary>
     /// 轴状态视图模型
     /// </summary>
-    public class AxisStatusViewModel
+    public class AxisStatusViewModel : INotifyPropertyChanged
     {
-        public int AxisId { get; set; }
-        public string AxisName { get; set; }
-        public double Position { get; set; }
-        public double CommandPosition { get; set; }
-        public double Speed { get; set; }
-        public bool ServoOn { get; set; }
-        public bool IsRunning { get; set; }
-        public bool InPosition { get; set; }
-        public bool IsAlarm { get; set; }
-        public bool PositiveLimit { get; set; }
-        public bool NegativeLimit { get; set; }
-        public bool HomeSignal { get; set; }
+        private int _axisId;
+        private string _axisName;
+        private double _position;
+        private double _commandPosition;
+        private double _speed;
+        private bool _servoOn;
+        private bool _isRunning;
+        private bool _inPosition;
+        private bool _isAlarm;
+        private bool _positiveLimit;
+        private bool _negativeLimit;
+        private bool _homeSignal;
+        private bool _isSelected;
+
+        public int AxisId
+        {
+            get => _axisId;
+            set { _axisId = value; OnPropertyChanged(nameof(AxisId)); }
+        }
+
+        public string AxisName
+        {
+            get => _axisName;
+            set { _axisName = value; OnPropertyChanged(nameof(AxisName)); }
+        }
+
+        public double Position
+        {
+            get => _position;
+            set { _position = value; OnPropertyChanged(nameof(Position)); }
+        }
+
+        public double CommandPosition
+        {
+            get => _commandPosition;
+            set { _commandPosition = value; OnPropertyChanged(nameof(CommandPosition)); }
+        }
+
+        public double Speed
+        {
+            get => _speed;
+            set { _speed = value; OnPropertyChanged(nameof(Speed)); }
+        }
+
+        public bool ServoOn
+        {
+            get => _servoOn;
+            set { _servoOn = value; OnPropertyChanged(nameof(ServoOn)); }
+        }
+
+        public bool IsRunning
+        {
+            get => _isRunning;
+            set { _isRunning = value; OnPropertyChanged(nameof(IsRunning)); }
+        }
+
+        public bool InPosition
+        {
+            get => _inPosition;
+            set { _inPosition = value; OnPropertyChanged(nameof(InPosition)); }
+        }
+
+        public bool IsAlarm
+        {
+            get => _isAlarm;
+            set { _isAlarm = value; OnPropertyChanged(nameof(IsAlarm)); }
+        }
+
+        public bool PositiveLimit
+        {
+            get => _positiveLimit;
+            set { _positiveLimit = value; OnPropertyChanged(nameof(PositiveLimit)); }
+        }
+
+        public bool NegativeLimit
+        {
+            get => _negativeLimit;
+            set { _negativeLimit = value; OnPropertyChanged(nameof(NegativeLimit)); }
+        }
+
+        public bool HomeSignal
+        {
+            get => _homeSignal;
+            set { _homeSignal = value; OnPropertyChanged(nameof(HomeSignal)); }
+        }
+
+        public bool IsSelected
+        {
+            get => _isSelected;
+            set { _isSelected = value; OnPropertyChanged(nameof(IsSelected)); }
+        }
+
+        public event PropertyChangedEventHandler PropertyChanged;
+
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new PropertyChangedEventArgs(propertyName));
+        }
     }
 }

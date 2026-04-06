@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
@@ -19,13 +19,17 @@ namespace CoreToolkit.Tests
             Console.WriteLine("  1. SQLite 数据库测试 (默认)");
             Console.WriteLine("  2. PCI-1285 运动控制卡测试");
             Console.WriteLine("  3. 轴组/插补/PTP/PVT测试");
+            Console.WriteLine("  4. 状态机测试（组装流程）");
             Console.WriteLine();
-            Console.Write("请输入选项 (1-3，默认1): ");
+            Console.Write("请输入选项 (1-4，默认1): ");
             
             string choice = Console.ReadLine()?.Trim() ?? "1";
             
             switch (choice)
             {
+                case "4":
+                    await RunStateMachineTestAsync();
+                    break;
                 case "3":
                     await RunAxisGroupTestAsync();
                     break;
@@ -364,6 +368,19 @@ namespace CoreToolkit.Tests
                 Console.WriteLine($"备份错误：{ex.Message}");
             }
 
+            Console.WriteLine();
+            Console.WriteLine("按任意键退出...");
+            Console.ReadKey();
+        }
+
+        /// <summary>
+        /// 运行状态机测试（组装流程）
+        /// </summary>
+        static async Task RunStateMachineTestAsync()
+        {
+            var test = new StateMachineTest();
+            await test.RunAssemblyTestAsync();
+            
             Console.WriteLine();
             Console.WriteLine("按任意键退出...");
             Console.ReadKey();
