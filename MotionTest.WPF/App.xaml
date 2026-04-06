@@ -1,8 +1,8 @@
-<Application x:Class="MotionTest.WPF.App"
+﻿<Application x:Class="MotionTest.WPF.App"
              xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
              xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
              StartupUri="MainWindow.xaml">
     <Application.Resources>
-        <!-- 可以在这里添加全局样式 -->
+         <BooleanToVisibilityConverter x:Key="BooleanToVisibilityConverter"/>
     </Application.Resources>
 </Application>

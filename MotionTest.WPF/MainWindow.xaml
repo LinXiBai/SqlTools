@@ -1,99 +1,192 @@
-<Window x:Class="MotionTest.WPF.MainWindow"
+﻿<Window x:Class="MotionTest.WPF.MainWindow"
         xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
-        Title="研华运动控制卡测试程序" Height="700" Width="1000"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="PCI-1285 运动控制卡测试工具" Height="700" Width="1200"
         WindowStartupLocation="CenterScreen">
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
-            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
             <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-
-        <!-- 标题 -->
-        <Border Grid.Row="0" Background="#FF2D2D30" Padding="10">
-            <TextBlock x:Name="txtTitle" Text="研华运动控制卡测试" 
-                       Foreground="White" FontSize="20" FontWeight="Bold"/>
+        
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="#FF2D2D30" Padding="15,10">
+            <TextBlock Text="研华 PCI-1285 运动控制卡测试工具" 
+                       Foreground="White" FontSize="18" FontWeight="Bold"/>
         </Border>
-
-        <!-- 控制卡操作 -->
-        <Border Grid.Row="1" Background="#FFF0F0F0" Padding="10" Margin="5">
-            <StackPanel Orientation="Horizontal">
-                <TextBlock Text="卡类型:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                <ComboBox x:Name="cmbCardType" Width="120" SelectedIndex="0">
-                    <ComboBoxItem>PCI-1285</ComboBoxItem>
-                    <ComboBoxItem>PCI-1203 (16轴)</ComboBoxItem>
-                    <ComboBoxItem>PCI-1203 (32轴)</ComboBoxItem>
-                </ComboBox>
-                <TextBlock Text="卡号:" VerticalAlignment="Center" Margin="10,0,5,0"/>
-                <ComboBox x:Name="cmbCardId" Width="60" SelectedIndex="0">
-                    <ComboBoxItem>0</ComboBoxItem>
-                    <ComboBoxItem>1</ComboBoxItem>
-                    <ComboBoxItem>2</ComboBoxItem>
-                </ComboBox>
-                <Button x:Name="btnInit" Content="初始化" Width="80" Margin="10,0,5,0" Click="btnInit_Click"/>
-                <Button x:Name="btnOpen" Content="打开" Width="80" Margin="5,0,5,0" Click="btnOpen_Click" IsEnabled="False"/>
-                <Button x:Name="btnClose" Content="关闭" Width="80" Margin="5,0,5,0" Click="btnClose_Click" IsEnabled="False"/>
-                <Button x:Name="btnReset" Content="复位" Width="80" Margin="5,0,5,0" Click="btnReset_Click" IsEnabled="False"/>
-                <Button x:Name="btnDatabase" Content="数据库管理" Width="100" Margin="5,0,5,0" Click="btnDatabase_Click"/>
-                <TextBlock x:Name="txtStatus" Text="状态: 未初始化" VerticalAlignment="Center" Margin="20,0,0,0" FontWeight="Bold"/>
-            </StackPanel>
-        </Border>
-
-        <!-- 轴控制区域 -->
-        <TabControl Grid.Row="2" Margin="5">
-            <TabItem Header="轴控制">
-                <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel x:Name="spAxes">
-                        <!-- 动态生成轴的控制界面 -->
-                    </StackPanel>
-                </ScrollViewer>
-            </TabItem>
-            <TabItem Header="IO控制">
+        
+        <!-- 主内容区 -->
+        <Grid Grid.Row="1" Margin="10">
+            <Grid.ColumnDefinitions>
+                <ColumnDefinition Width="300"/>
+                <ColumnDefinition Width="*"/>
+            </Grid.ColumnDefinitions>
+            
+            <!-- 左侧面板：控制 -->
+            <Border Grid.Column="0" BorderBrush="#FFCCCCCC" BorderThickness="1" Margin="0,0,10,0">
                 <Grid>
-                    <Grid.ColumnDefinitions>
-                        <ColumnDefinition Width="*"/>
-                        <ColumnDefinition Width="*"/>
-                    </Grid.ColumnDefinitions>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
                     
-                    <!-- 输入 -->
-                    <Border Grid.Column="0" Background="#FFE8F5E9" Padding="10" Margin="5">
-                        <StackPanel>
-                            <TextBlock Text="数字输入 (DI)" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                            <UniformGrid x:Name="ugInputs" Columns="8">
-                                <!-- 动态生成输入指示灯 -->
-                            </UniformGrid>
-                            <Button x:Name="btnRefreshInputs" Content="刷新输入" Width="100" Margin="0,10,0,0" HorizontalAlignment="Left" Click="btnRefreshInputs_Click"/>
+                    <!-- 卡控制 -->
+                    <GroupBox Grid.Row="0" Header="控制卡操作" Margin="5">
+                        <StackPanel Margin="5">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="卡类型:" VerticalAlignment="Center" Width="60"/>
+                                <ComboBox x:Name="CardTypeCombo" Width="150" SelectedIndex="0">
+                                    <ComboBoxItem>PCI-1285</ComboBoxItem>
+                                    <ComboBoxItem>PCI-1203</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="卡号:" VerticalAlignment="Center" Width="60"/>
+                                <TextBox x:Name="CardIdText" Text="0" Width="150"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
+                                <Button x:Name="InitBtn" Content="初始化" Width="70" Margin="5,0" Click="InitBtn_Click"/>
+                                <Button x:Name="OpenBtn" Content="打开" Width="70" Margin="5,0" Click="OpenBtn_Click"/>
+                                <Button x:Name="CloseBtn" Content="关闭" Width="70" Margin="5,0" Click="CloseBtn_Click"/>
+                            </StackPanel>
+                            <TextBlock x:Name="CardStatusText" Text="状态: 未初始化" 
+                                       Foreground="Red" HorizontalAlignment="Center" Margin="0,5"/>
                         </StackPanel>
-                    </Border>
+                    </GroupBox>
                     
-                    <!-- 输出 -->
-                    <Border Grid.Column="1" Background="#FFFFEBEE" Padding="10" Margin="5">
-                        <StackPanel>
-                            <TextBlock Text="数字输出 (DO)" FontWeight="Bold" FontSize="16" Margin="0,0,0,10"/>
-                            <UniformGrid x:Name="ugOutputs" Columns="8">
-                                <!-- 动态生成输出按钮 -->
-                            </UniformGrid>
-                            <Button x:Name="btnSetAllOutputs" Content="全部置位" Width="100" Margin="0,10,5,0" HorizontalAlignment="Left" Click="btnSetAllOutputs_Click"/>
-                            <Button x:Name="btnResetAllOutputs" Content="全部复位" Width="100" Margin="0,5,0,0" HorizontalAlignment="Left" Click="btnResetAllOutputs_Click"/>
+                    <!-- 轴控制 -->
+                    <GroupBox Grid.Row="1" Header="轴操作" Margin="5">
+                        <StackPanel Margin="5">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="轴号:" VerticalAlignment="Center" Width="60"/>
+                                <ComboBox x:Name="AxisCombo" Width="150" SelectedIndex="0">
+                                    <ComboBoxItem>0 - X轴</ComboBoxItem>
+                                    <ComboBoxItem>1 - Y轴</ComboBoxItem>
+                                    <ComboBoxItem>2 - Z轴</ComboBoxItem>
+                                    <ComboBoxItem>3 - R轴</ComboBoxItem>
+                                    <ComboBoxItem>4 - A轴</ComboBoxItem>
+                                    <ComboBoxItem>5 - B轴</ComboBoxItem>
+                                    <ComboBoxItem>6 - C轴</ComboBoxItem>
+                                    <ComboBoxItem>7 - D轴</ComboBoxItem>
+                                </ComboBox>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
+                                <Button x:Name="ServoOnBtn" Content="伺服ON" Width="70" Margin="5,0" Click="ServoOnBtn_Click"/>
+                                <Button x:Name="ServoOffBtn" Content="伺服OFF" Width="70" Margin="5,0" Click="ServoOffBtn_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
+                                <Button x:Name="HomeBtn" Content="回零" Width="70" Margin="5,0" Click="HomeBtn_Click"/>
+                                <Button x:Name="ResetBtn" Content="复位" Width="70" Margin="5,0" Click="ResetBtn_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <TextBlock Text="位置:" VerticalAlignment="Center" Width="60"/>
+                                <TextBox x:Name="PositionText" Text="1000" Width="100"/>
+                                <TextBlock Text=" 速度:" VerticalAlignment="Center"/>
+                                <TextBox x:Name="SpeedText" Text="5000" Width="60"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
+                                <Button x:Name="MoveAbsBtn" Content="绝对运动" Width="70" Margin="5,0" Click="MoveAbsBtn_Click"/>
+                                <Button x:Name="MoveRelBtn" Content="相对运动" Width="70" Margin="5,0" Click="MoveRelBtn_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,5">
+                                <Button x:Name="JogPosBtn" Content="JOG+" Width="70" Margin="5,0" 
+                                        PreviewMouseDown="JogPosBtn_PreviewMouseDown" 
+                                        PreviewMouseUp="JogPosBtn_PreviewMouseUp"/>
+                                <Button x:Name="JogNegBtn" Content="JOG-" Width="70" Margin="5,0"
+                                        PreviewMouseDown="JogNegBtn_PreviewMouseDown" 
+                                        PreviewMouseUp="JogNegBtn_PreviewMouseUp"/>
+                            </StackPanel>
+                            <Button x:Name="StopBtn" Content="停止" Width="150" Margin="0,5" Click="StopBtn_Click"/>
                         </StackPanel>
-                    </Border>
+                    </GroupBox>
+                    
+                    <!-- IO控制 -->
+                    <GroupBox Grid.Row="2" Header="IO操作" Margin="5">
+                        <StackPanel Margin="5">
+                            <StackPanel Orientation="Horizontal" Margin="0,0,0,5">
+                                <TextBlock Text="输出点:" VerticalAlignment="Center" Width="60"/>
+                                <ComboBox x:Name="OutputCombo" Width="100" SelectedIndex="0">
+                                    <ComboBoxItem>0</ComboBoxItem>
+                                    <ComboBoxItem>1</ComboBoxItem>
+                                    <ComboBoxItem>2</ComboBoxItem>
+                                    <ComboBoxItem>3</ComboBoxItem>
+                                </ComboBox>
+                                <Button x:Name="OutputOnBtn" Content="ON" Width="40" Margin="5,0" Click="OutputOnBtn_Click"/>
+                                <Button x:Name="OutputOffBtn" Content="OFF" Width="40" Margin="5,0" Click="OutputOffBtn_Click"/>
+                            </StackPanel>
+                            <StackPanel Orientation="Horizontal" Margin="0,5">
+                                <TextBlock Text="输入点0:" VerticalAlignment="Center" Width="60"/>
+                                <Ellipse x:Name="InputIndicator" Width="20" Height="20" Fill="Gray" Margin="5,0"/>
+                                <TextBlock x:Name="InputStatusText" Text="未知" VerticalAlignment="Center"/>
+                                <Button x:Name="RefreshInputBtn" Content="刷新" Width="50" Margin="10,0" Click="RefreshInputBtn_Click"/>
+                            </StackPanel>
+                        </StackPanel>
+                    </GroupBox>
+                    
+                    <!-- 数据库操作 -->
+                    <GroupBox Grid.Row="3" Header="数据库操作" Margin="5">
+                        <StackPanel Margin="5">
+                            <Button x:Name="InitDbBtn" Content="初始化数据库" Margin="0,2" Click="InitDbBtn_Click"/>
+                            <Button x:Name="LoadParamsBtn" Content="加载轴参数" Margin="0,2" Click="LoadParamsBtn_Click"/>
+                            <Button x:Name="SaveParamsBtn" Content="保存轴参数" Margin="0,2" Click="SaveParamsBtn_Click"/>
+                            <Button x:Name="ViewLogsBtn" Content="查看日志" Margin="0,2" Click="ViewLogsBtn_Click"/>
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
-            </TabItem>
-        </TabControl>
-
-        <!-- 日志区域 -->
-        <Border Grid.Row="3" Background="#FF1E1E1E" Padding="5" Margin="5">
+            </Border>
+            
+            <!-- 右侧面板：轴状态显示 -->
+            <Border Grid.Column="1" BorderBrush="#FFCCCCCC" BorderThickness="1">
+                <Grid>
+                    <Grid.RowDefinitions>
+                        <RowDefinition Height="Auto"/>
+                        <RowDefinition Height="*"/>
+                    </Grid.RowDefinitions>
+                    
+                    <TextBlock Grid.Row="0" Text="轴状态监控" FontWeight="Bold" FontSize="14" 
+                               Margin="10,5" HorizontalAlignment="Center"/>
+                    
+                    <DataGrid Grid.Row="1" x:Name="AxisStatusGrid" AutoGenerateColumns="False" 
+                              IsReadOnly="True" Margin="5" CanUserAddRows="False">
+                        <DataGrid.Columns>
+                            <DataGridTextColumn Header="轴号" Binding="{Binding AxisId}" Width="50"/>
+                            <DataGridTextColumn Header="名称" Binding="{Binding AxisName}" Width="80"/>
+                            <DataGridTextColumn Header="当前位置" Binding="{Binding Position, StringFormat=F2}" Width="100"/>
+                            <DataGridTextColumn Header="命令位置" Binding="{Binding CommandPosition, StringFormat=F2}" Width="100"/>
+                            <DataGridTextColumn Header="速度" Binding="{Binding Speed, StringFormat=F2}" Width="80"/>
+                            <DataGridCheckBoxColumn Header="伺服ON" Binding="{Binding ServoOn}" Width="70"/>
+                            <DataGridCheckBoxColumn Header="运行中" Binding="{Binding IsRunning}" Width="70"/>
+                            <DataGridCheckBoxColumn Header="到位" Binding="{Binding InPosition}" Width="60"/>
+                            <DataGridCheckBoxColumn Header="报警" Binding="{Binding IsAlarm}" Width="60"/>
+                            <DataGridCheckBoxColumn Header="正限位" Binding="{Binding PositiveLimit}" Width="70"/>
+                            <DataGridCheckBoxColumn Header="负限位" Binding="{Binding NegativeLimit}" Width="70"/>
+                            <DataGridCheckBoxColumn Header="原点" Binding="{Binding HomeSignal}" Width="60"/>
+                        </DataGrid.Columns>
+                    </DataGrid>
+                </Grid>
+            </Border>
+        </Grid>
+        
+        <!-- 底部日志区 -->
+        <Border Grid.Row="2" BorderBrush="#FFCCCCCC" BorderThickness="1" Margin="10,0,10,10">
             <Grid>
                 <Grid.RowDefinitions>
                     <RowDefinition Height="Auto"/>
                     <RowDefinition Height="*"/>
                 </Grid.RowDefinitions>
-                <TextBlock Text="日志:" Foreground="White" FontWeight="Bold" Margin="0,0,0,5"/>
-                <TextBox x:Name="txtLog" Grid.Row="1" Background="#FF1E1E1E" Foreground="#FF00FF00" 
-                         FontFamily="Consolas" FontSize="12" IsReadOnly="True" 
-                         VerticalScrollBarVisibility="Auto" TextWrapping="Wrap"/>
+                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FFF0F0F0" Margin="5">
+                    <TextBlock Text="操作日志" FontWeight="Bold" VerticalAlignment="Center"/>
+                    <Button x:Name="ClearLogBtn" Content="清空" Width="60" Margin="10,0,0,0" Click="ClearLogBtn_Click"/>
+                </StackPanel>
+                <TextBox Grid.Row="1" x:Name="LogTextBox" IsReadOnly="True" 
+                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
+                         FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
             </Grid>
         </Border>
     </Grid>

@@ -1,0 +1,87 @@
+🔴 严重问题（建议优先修复）
+1. AdvancedTcpClient.cs — 资源释放与后台任务竞争
+问题：DisconnectInternal 里把 _stream、_client、_cts 直接置 null，但后台的 ReceiveLoop / HeartbeatLoop 可能还在运行，后续访问会抛 NullReferenceException。
+修复：Cancel() 后应等待任务结束再清理资源：
+_cts?.Cancel();
+try { _receiveTask?.Wait(TimeSpan.FromSeconds(2)); } catch { }
+try { _heartbeatTask?.Wait(TimeSpan.FromSeconds(2)); } catch { }
+// 再 Close / 置 null
+2. AdvancedTcpClient.cs / MesHttpClient.cs — 同步包装异步导致死锁
+问题：Connect() 用 .GetAwaiter().GetResult() 阻塞等待异步任务；MesHttpClient 的 TrackIn() 等同步方法也这么写。在 WPF UI 线程调用时极易死锁。
+修复：类库中的 await 应全部加上 .ConfigureAwait(false)；同步方法要么删掉，要么在专门线程中执行。
+3. MesHttpClient.cs — HttpClient 资源泄漏
+问题：new MesHttpClient() 会 new HttpClient()，但类没有实现 IDisposable，频繁短生命周期实例化会导致端口耗尽。
+修复：实现 IDisposable，在 Dispose 中释放 _httpClient；或者让调用方传入长生命周期的 HttpClient 实例。
+4. MesHttpClient.cs — 请求消息未释放
+问题：StringContent 和 HttpRequestMessage 实现了 IDisposable，代码中未放入 using，高并发时会有Native 内存泄漏。
+修复：
+using var content = new StringContent(json, Encoding.UTF8, "application/json");
+using var request = new HttpRequestMessage(method, uri) { Content = content };
+5. TcpFrameParser.cs / SerialFrameParser.cs — 缓冲区无限增长（DoS/OOM 风险）
+问题：如果网络对端持续发送垃圾数据且始终找不到结束符/帧头，_buffer（List<byte>）会无限增长直到内存耗尽。
+修复：设置最大缓冲区阈值（如 64KB），超限后清空并触发错误事件：
+const int MaxBufferSize = 65536;
+if (_buffer.Count > MaxBufferSize)
+{
+    _buffer.Clear();
+    // 可触发 Error 事件
+}
+6. RecipeManager.cs — 无线程安全 + 路径注入风险
+问题：多线程同时 Save/Load 同一配方会导致文件损坏或 IOException；recipeName 直接拼路径，若传入 ../../Windows/system.ini 会写到危险目录。
+修复：
+引入 ReaderWriterLockSlim 或 SemaphoreSlim 保护文件读写
+对 recipeName 做校验：Path.GetInvalidFileNameChars() 检查，或 Path.GetFileName 过滤
+🟡 中等问题（影响稳定性或正确性）
+7. AdvancedTcpClient.cs — _isReconnecting 标志非线程安全
+问题：多线程下可能出现两个重连任务同时运行。
+修复：用 Interlocked：
+if (Interlocked.CompareExchange(ref _isReconnecting, 1, 0) == 1) return;
+// 循环结束后 Interlocked.Exchange(ref _isReconnecting, 0);
+8. AdvancedTcpClient.cs / TcpServerHelper.cs — 异步发送缺少并发控制
+问题：SendAsync / ReceiveAsync 未加锁，多线程并发向同一个 NetworkStream 写数据会导致帧数据交错。
+修复：引入 SemaphoreSlim _asyncLock = new SemaphoreSlim(1, 1);
+9. TcpServerHelper.cs — Send 使用全局锁
+问题：一个客户端发送时，所有客户端都被阻塞。
+修复：去掉实例级全局锁，改为对单个 NetworkStream 加锁，或每个客户端配一个 SemaphoreSlim。
+10. TcpServerHelper.cs — 覆盖旧连接未释放
+问题：_clients[endpoint] = client 直接赋值，若同一 IP 重连，旧 TcpClient 被覆盖且未 Close。
+修复：
+if (!_clients.TryAdd(endpoint, client)) 
+{ 
+    try { client.Close(); } catch { } 
+    return; 
+}
+11. SerialPortManager.cs — Write 存在竞态条件
+问题：GetPort 在 lock 内，但 IsOpen 检查和 Write 在 lock 外，其他线程可能在这期间 RemovePort。
+修复：把完整的发送流程放到 lock (_lock) 内。
+12. SerialPortScanner.cs — ManagementObject 未释放
+问题：WMI 查询到的 ManagementObject 实现了 IDisposable，foreach 中未 using 会导致WMI 资源泄漏。
+修复：
+foreach (ManagementObject item in searcher.Get())
+{
+    using (item) { /* ... */ }
+}
+13. MesHelper.cs — new Random() 导致流水号冲突
+问题：高频调用时系统时间种子相同，可能生成完全一样的 TransactionId。
+修复：使用 Guid.NewGuid().ToString("N")[0..8] 或维护 static readonly Random _rnd = new Random();
+14. CalibrationHelper.cs — 旋转中心计算失败返回 (0, 0)
+问题：当两角度相同或过于接近时，直接返回 (0,0)，调用方无法区分“真在原点”和“计算失败”。
+修复：返回可空元组或抛出异常：
+if (Math.Abs(angle1Deg - angle2Deg) < 1e-6) 
+    throw new ArgumentException("两个角度不能相同。");
+🟢 一般建议（优化和健壮性）
+15. 各类 Dispose 未按标准模式实现
+涉及的类：AdvancedTcpClient、TcpServerHelper、AdvancedSerialPort、SerialPortManager 等
+建议：增加 protected virtual void Dispose(bool disposing) 和 _disposed 标志，防止重复释放。
+16. CoordinateTransform.cs — 每次调用重复计算三角函数
+PixelToMachine / MachineToPixel 中每次都算 Math.Cos / Math.Sin。
+建议：在 AngleRad 的 setter 中缓存 _cosAngle / _sinAngle。
+17. GeometryHelper.cs — Intersection 使用 Tan 导致垂直线精度灾难
+当角度接近 90° 时，Math.Tan 趋于无穷大，交点误差会非常大。
+建议：改用参数方程或方向向量求解，避免 Tan。
+18. TcpFrameParser.cs — BuildFrameFromRaw 中三元运算符冗余
+LengthIncludesHeader ? (raw.Length - ChecksumLength - HeaderLength) : (raw.Length - ChecksumLength - HeaderLength);
+两个分支表达式完全一样，可直接简化。
+19. AdvancedSerialPort.cs — Read / ReadLine 修改超时后未恢复
+方法内将 ReadTimeout 设为参数值，返回前未恢复原来的设置。
+建议：用 try-finally 保存并恢复旧值。

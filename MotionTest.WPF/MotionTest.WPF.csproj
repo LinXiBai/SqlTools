@@ -1,15 +1,19 @@
-<Project Sdk="Microsoft.NET.Sdk">
+﻿<Project Sdk="Microsoft.NET.Sdk">
 
   <PropertyGroup>
     <OutputType>WinExe</OutputType>
     <TargetFramework>net472</TargetFramework>
     <UseWPF>true</UseWPF>
-    <GenerateAssemblyInfo>false</GenerateAssemblyInfo>
+    <LangVersion>8.0</LangVersion>
   </PropertyGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\MotionLib\MotionLib.csproj" />
-    <ProjectReference Include="..\SqlDemo.Data\SqlDemo.Data.csproj" />
+    <ProjectReference Include="..\CoreToolkit\CoreToolkit.csproj" />
+    <ProjectReference Include="..\CoreToolkit.Desktop\CoreToolkit.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration" />
   </ItemGroup>
 
 </Project>
