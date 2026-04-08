@@ -1,0 +1,82 @@
+<Window x:Class="LicenseManager.WPF.DetailWindow"
+        xmlns="http://schemas.microsoft.com/winfx/2006/xaml/presentation"
+        xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
+        xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
+        xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
+        mc:Ignorable="d"
+        Title="授权记录详情" Height="500" Width="700"
+        WindowStartupLocation="CenterScreen">
+    <Grid Margin="10">
+        <Grid.RowDefinitions>
+            <RowDefinition Height="Auto"/>
+            <RowDefinition Height="*"/>
+            <RowDefinition Height="Auto"/>
+        </Grid.RowDefinitions>
+        
+        <TextBlock Grid.Row="0" Text="授权记录详情" FontWeight="Bold" FontSize="16" 
+                   Margin="0,0,0,10" HorizontalAlignment="Center"/>
+        
+        <ScrollViewer Grid.Row="1" VerticalScrollBarVisibility="Auto">
+            <StackPanel>
+                <GroupBox Header="基本信息" Margin="0,5">
+                    <Grid Margin="10">
+                        <Grid.ColumnDefinitions>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                            <ColumnDefinition Width="100"/>
+                            <ColumnDefinition Width="*"/>
+                        </Grid.ColumnDefinitions>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="0" Text="记录ID:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="1" x:Name="IdText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="0" Grid.Column="2" Text="记录时间:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="0" Grid.Column="3" x:Name="RecordTimeText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="0" Text="部门:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="1" x:Name="DepartmentText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="1" Grid.Column="2" Text="记录人:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="1" Grid.Column="3" x:Name="OperatorText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="项目号:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="ProjectNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="设备号:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="DeviceNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="创建时间:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="CreatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="3" Grid.Column="2" Text="更新时间:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="UpdatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                    </Grid>
+                </GroupBox>
+                
+                <GroupBox Header="机器码信息" Margin="0,5">
+                    <StackPanel Margin="10">
+                        <TextBox x:Name="MachineCodeJsonText" Height="80" 
+                                 IsReadOnly="True" Background="#FFF0F0F0"
+                                 VerticalScrollBarVisibility="Auto"
+                                 TextWrapping="Wrap"/>
+                        <Button x:Name="ViewMachineCodeDetailBtn" Content="查看机器码详情" 
+                                Width="120" Margin="0,5,0,0" HorizontalAlignment="Left"
+                                Click="ViewMachineCodeDetailBtn_Click"/>
+                    </StackPanel>
+                </GroupBox>
+            </StackPanel>
+        </ScrollViewer>
+        
+        <StackPanel Grid.Row="2" Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,10,0,0">
+            <Button x:Name="CopyMachineCodeBtn" Content="复制机器码" Width="100" Margin="5" Click="CopyMachineCodeBtn_Click"/>
+            <Button x:Name="ExportBtn" Content="导出记录" Width="100" Margin="5" Click="ExportBtn_Click"/>
+            <Button x:Name="CloseBtn" Content="关闭" Width="100" Margin="5" Click="CloseBtn_Click" IsDefault="True"/>
+        </StackPanel>
+    </Grid>
+</Window>

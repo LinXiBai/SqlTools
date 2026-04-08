@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.ComponentModel;
 using System.Threading;
@@ -260,7 +260,7 @@ namespace MotionTest.WPF
                 LogMessage($"轴{axis} 伺服ON");
                 
                 // 立即刷新该轴状态
-                RefreshAxisStatus(axis);
+                RefreshSingleAxisStatus(axis);
             }
             catch (Exception ex)
             {
@@ -282,7 +282,7 @@ namespace MotionTest.WPF
                 LogMessage($"轴{axis} 伺服OFF");
                 
                 // 立即刷新该轴状态
-                RefreshAxisStatus(axis);
+                RefreshSingleAxisStatus(axis);
             }
             catch (Exception ex)
             {
@@ -781,6 +781,35 @@ namespace MotionTest.WPF
         private void ClearLogBtn_Click(object sender, RoutedEventArgs e)
         {
             LogTextBox.Clear();
+        }
+
+        /// <summary>
+        /// 刷新单个轴状态
+        /// </summary>
+        private void RefreshSingleAxisStatus(int axis)
+        {
+            if (!_isCardOpen || _motionCard == null) return;
+
+            try
+            {
+                var status = _motionCard.GetAxisStatus(axis);
+                var vm = _axisStatusList[axis];
+                vm.Position = status.ActualPosition;
+                vm.CommandPosition = status.CommandPosition;
+                vm.Speed = status.CurrentSpeed;
+                vm.ServoOn = status.ServoOn;
+                vm.IsRunning = status.IsRunning;
+                vm.InPosition = status.InPosition;
+                vm.IsAlarm = status.IsAlarm;
+                vm.PositiveLimit = status.PositiveLimit;
+                vm.NegativeLimit = status.NegativeLimit;
+                vm.HomeSignal = status.HomeSignal;
+                AxisStatusGrid.Items.Refresh();
+            }
+            catch
+            {
+                // 忽略状态读取错误
+            }
         }
 
         /// <summary>

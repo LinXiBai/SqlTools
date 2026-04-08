@@ -1,0 +1,22 @@
+<Project Sdk="Microsoft.NET.Sdk">
+
+  <PropertyGroup>
+    <OutputType>WinExe</OutputType>
+    <TargetFramework>net472</TargetFramework>
+    <UseWPF>true</UseWPF>
+    <LangVersion>8.0</LangVersion>
+    <RootNamespace>LicenseManager.WPF</RootNamespace>
+    <AssemblyName>LicenseManager.WPF</AssemblyName>
+  </PropertyGroup>
+
+  <ItemGroup>
+    <ProjectReference Include="..\CoreToolkit\CoreToolkit.csproj" />
+    <ProjectReference Include="..\CoreToolkit.Desktop\CoreToolkit.Desktop.csproj" />
+  </ItemGroup>
+
+  <ItemGroup>
+    <Reference Include="System.Configuration" />
+    <Reference Include="System.Management" />
+  </ItemGroup>
+
+</Project>

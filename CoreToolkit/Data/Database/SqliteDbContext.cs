@@ -214,6 +214,7 @@ namespace CoreToolkit.Data
             InitLogsTable();
             InitAxisParametersTable();
             InitIOParametersTable();
+            InitLicenseRecordsTable();
         }
 
         /// <summary>初始化轴参数表</summary>
@@ -317,6 +318,39 @@ namespace CoreToolkit.Data
 
             // 自动检测并添加新列
             AutoAddMissingColumns<Log>("Logs");
+        }
+
+        /// <summary>初始化授权记录表</summary>
+        private void InitLicenseRecordsTable()
+        {
+            // 创建表（如果不存在）
+            string createTableSql = @"
+                CREATE TABLE IF NOT EXISTS LicenseRecords (
+                    Id INTEGER PRIMARY KEY AUTOINCREMENT,
+                    RecordTime TEXT DEFAULT CURRENT_TIMESTAMP,
+                    Department TEXT,
+                    Operator TEXT,
+                    ProjectNumber TEXT,
+                    DeviceNumber TEXT,
+                    MachineCode TEXT,
+                    LicenseCode TEXT,
+                    CreatedAt TEXT DEFAULT CURRENT_TIMESTAMP,
+                    UpdatedAt TEXT DEFAULT CURRENT_TIMESTAMP
+                );
+            ";
+            Execute(createTableSql);
+
+            // 创建索引
+            string createIndexSql = @"
+                CREATE INDEX IF NOT EXISTS IX_LicenseRecords_ProjectNumber ON LicenseRecords(ProjectNumber);
+                CREATE INDEX IF NOT EXISTS IX_LicenseRecords_DeviceNumber ON LicenseRecords(DeviceNumber);
+                CREATE INDEX IF NOT EXISTS IX_LicenseRecords_MachineCode ON LicenseRecords(MachineCode);
+                CREATE INDEX IF NOT EXISTS IX_LicenseRecords_RecordTime ON LicenseRecords(RecordTime);
+            ";
+            Execute(createIndexSql);
+
+            // 自动检测并添加新列
+            AutoAddMissingColumns<LicenseRecord>("LicenseRecords");
         }
 
         /// <summary>自动检测并添加缺失的列</summary>
