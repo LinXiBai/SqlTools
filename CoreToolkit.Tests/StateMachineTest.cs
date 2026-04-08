@@ -310,7 +310,7 @@ namespace CoreToolkit.Tests
             {
                 TimeoutMs = 1000
             };
-            finishStep.SetAction((context, token) =>
+            finishStep.SetAction((ctx, token) =>
             {
                 Console.WriteLine("🎉 组装流程完成！");
                 return Task.FromResult(true);
@@ -379,6 +379,8 @@ namespace CoreToolkit.Tests
         private class MockMotionCard : IMotionCard
         {
             private readonly double[] _positions = new double[3]; // X, Y, Z
+            private readonly bool[] _servoStates = new bool[3];
+            private bool _disposed = false;
 
             public string CardName => "MockMotionCard";
             public string Vendor => "MockVendor";
@@ -408,37 +410,74 @@ namespace CoreToolkit.Tests
 
             public void MoveAbsolute(int axis, double position, double speed) { }
             public void MoveRelative(int axis, double distance, double speed) { }
-            public void JOG(int axis, double speed) { }
-            public void Stop(int axis) { }
-            public void StopAll() { }
-            public void Home(int axis) { }
-            public void HomeAll() { }
-            public void SetServoEnable(int axis, bool enable) { }
-            public void SetServoEnableAll(bool enable) { }
-            public void SetVelocity(int axis, double velocity) { }
-            public void SetAcceleration(int axis, double acceleration) { }
-            public void SetDeceleration(int axis, double deceleration) { }
-            public double GetVelocity(int axis) { return 0; }
-            public double GetAcceleration(int axis) { return 0; }
-            public double GetDeceleration(int axis) { return 0; }
-            public int GetAxisStatus(int axis) { return 0; }
+
+            public void Jog(int axis, int direction, double speed) { }
+
+            public void Stop(int axis, bool emergency = false) { }
+            public void StopAll(bool emergency = false) { }
+
+            public void Home(int axis, double speed) { }
+
+            public AxisStatus GetAxisStatus(int axis)
+            {
+                return new AxisStatus();
+            }
+
             public bool IsInPosition(int axis) { return true; }
-            public bool IsMotionDone(int axis) { return true; }
-            public void LinearInterpolation(double[] positions, double[] velocities, double[] accelerations) { }
-            public void WaitForMotionComplete(int axis) { }
-            public void WaitForMotionCompleteAll() { }
-            public void SetHomeOffset(int axis, double offset) { }
-            public double GetHomeOffset(int axis) { return 0; }
-            public void SetSoftLimit(int axis, double min, double max) { }
-            public (double, double) GetSoftLimit(int axis) { return (0, 0); }
-            public void SetHardLimit(int axis, double min, double max) { }
-            public (double, double) GetHardLimit(int axis) { return (0, 0); }
+
+            public void SetServoEnable(int axis, bool enable)
+            {
+                if (axis >= 0 && axis < _servoStates.Length)
+                    _servoStates[axis] = enable;
+            }
+
+            public bool GetServoEnable(int axis)
+            {
+                if (axis >= 0 && axis < _servoStates.Length)
+                    return _servoStates[axis];
+                return false;
+            }
+
+            public void SetVelocityProfile(int axis, double acc, double dec, double sCurve = 0) { }
+
+            public bool ReadInput(int index) { return false; }
+            public bool ReadOutput(int index) { return false; }
+            public void WriteOutput(int index, bool value) { }
+
+            public bool WaitForMotionComplete(int axis, int timeoutMs = 10000) { return true; }
+
+            public void LinearInterpolation(int[] axes, double[] positions, double speed) { }
+
+            public string GetLastError() { return ""; }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed) return;
+
+                if (disposing)
+                {
+                }
+
+                _disposed = true;
+            }
+
+            ~MockMotionCard()
+            {
+                Dispose(false);
+            }
         }
 
         // 模拟IO卡
         private class MockIOCard : IIOCard
         {
             private readonly bool[] _outputs = new bool[4];
+            private bool _disposed = false;
 
             public string CardName => "MockIOCard";
             public string Vendor => "MockVendor";
@@ -449,16 +488,38 @@ namespace CoreToolkit.Tests
             public bool IsInitialized => true;
             public bool IsOpen => true;
 
-            public void Initialize(IoConfig config) { }
+            public void Initialize(int cardId) { }
             public void Open() { }
             public void Close() { }
             public void Reset() { }
 
             public bool ReadInput(int port)
             {
-                // 模拟输入：1号端口（基板到位）返回true
                 if (port == 1) return true;
                 return false;
+            }
+
+            public bool[] ReadInputs(int startIndex, int count)
+            {
+                bool[] result = new bool[count];
+                for (int i = 0; i < count && startIndex + i < 4; i++)
+                {
+                    result[i] = ReadInput(startIndex + i);
+                }
+                return result;
+            }
+
+            public byte ReadInputPort(int port)
+            {
+                byte value = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (ReadInput(port * 8 + i))
+                    {
+                        value |= (byte)(1 << i);
+                    }
+                }
+                return value;
             }
 
             public void WriteOutput(int port, bool state)
@@ -474,11 +535,85 @@ namespace CoreToolkit.Tests
                 return false;
             }
 
-            public void WriteAllOutputs(bool state) { }
-            public int ReadAllInputs() { return 0; }
-            public void WriteAllOutputs(int value) { }
-            public void SetDebounceTime(int port, int milliseconds) { }
-            public int GetDebounceTime(int port) { return 0; }
+            public bool[] ReadOutputs(int startIndex, int count)
+            {
+                bool[] result = new bool[count];
+                for (int i = 0; i < count && startIndex + i < _outputs.Length; i++)
+                {
+                    result[i] = ReadOutput(startIndex + i);
+                }
+                return result;
+            }
+
+            public byte ReadOutputPort(int port)
+            {
+                byte value = 0;
+                for (int i = 0; i < 8; i++)
+                {
+                    if (ReadOutput(port * 8 + i))
+                    {
+                        value |= (byte)(1 << i);
+                    }
+                }
+                return value;
+            }
+
+            public void WriteOutputs(int startIndex, bool[] values)
+            {
+                for (int i = 0; i < values.Length && startIndex + i < _outputs.Length; i++)
+                {
+                    WriteOutput(startIndex + i, values[i]);
+                }
+            }
+
+            public void WriteOutputPort(int port, byte value)
+            {
+                for (int i = 0; i < 8; i++)
+                {
+                    bool bitValue = (value & (1 << i)) != 0;
+                    WriteOutput(port * 8 + i, bitValue);
+                }
+            }
+
+            public void ToggleOutput(int index)
+            {
+                if (index >= 0 && index < _outputs.Length)
+                {
+                    _outputs[index] = !_outputs[index];
+                }
+            }
+
+            public void SetAllOutputs(bool value)
+            {
+                for (int i = 0; i < _outputs.Length; i++)
+                {
+                    _outputs[i] = value;
+                }
+            }
+
+            public string GetLastError() { return ""; }
+
+            public void Dispose()
+            {
+                Dispose(true);
+                GC.SuppressFinalize(this);
+            }
+
+            protected virtual void Dispose(bool disposing)
+            {
+                if (_disposed) return;
+
+                if (disposing)
+                {
+                }
+
+                _disposed = true;
+            }
+
+            ~MockIOCard()
+            {
+                Dispose(false);
+            }
         }
     }
 }

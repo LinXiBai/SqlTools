@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.ComponentModel;
 using System.Diagnostics;
 using System.IO;
@@ -140,6 +140,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 检查可执行文件是否存在
         /// </summary>
+        /// <param name="path">可执行文件路径（相对或绝对）</param>
+        /// <param name="baseDirectory">相对路径的基准目录</param>
+        /// <returns>如果可执行文件存在返回 true，否则返回 false</returns>
         public static bool ExecutableExists(string path, string baseDirectory = null)
         {
             return ResolveExecutablePath(path, baseDirectory) != null;
@@ -444,6 +447,11 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 打开 URL（使用默认浏览器）
         /// </summary>
+        /// <param name="url">要打开的 URL</param>
+        /// <returns>启动结果</returns>
+        /// <remarks>
+        /// 此方法会自动为 URL 添加 https:// 前缀（如果没有指定协议）
+        /// </remarks>
         public static ProcessStartResult OpenUrl(string url)
         {
             var result = new ProcessStartResult();
@@ -551,6 +559,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 检查进程是否正在运行
         /// </summary>
+        /// <param name="processId">进程ID</param>
+        /// <returns>如果进程正在运行返回 true，否则返回 false</returns>
         public static bool IsProcessRunning(int processId)
         {
             try
@@ -567,6 +577,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 检查进程是否正在运行
         /// </summary>
+        /// <param name="processName">进程名称（不含 .exe 后缀）</param>
+        /// <returns>如果进程正在运行返回 true，否则返回 false</returns>
         public static bool IsProcessRunning(string processName)
         {
             try
@@ -583,6 +595,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 终止进程
         /// </summary>
+        /// <param name="processId">进程ID</param>
+        /// <returns>如果成功终止进程返回 true，否则返回 false</returns>
         public static bool KillProcess(int processId)
         {
             try
@@ -600,6 +614,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 终止进程
         /// </summary>
+        /// <param name="processName">进程名称（不含 .exe 后缀）</param>
+        /// <returns>如果成功终止至少一个进程返回 true，否则返回 false</returns>
         public static bool KillProcess(string processName)
         {
             try
@@ -620,6 +636,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 获取进程信息
         /// </summary>
+        /// <param name="processId">进程ID</param>
+        /// <returns>进程对象，如果进程不存在返回 null</returns>
         public static Process GetProcess(int processId)
         {
             try

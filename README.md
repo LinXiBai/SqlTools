@@ -135,6 +135,7 @@ SqlDemo/
 │   ├── Files/                           # 文件管理
 │   │   ├── Helpers/
 │   │   │   ├── RecipeManager.cs         # 配方（Recipe）JSON 管理
+│   │   │   ├── FileIndexSearcher.cs     # 文件索引搜索器（支持20万+文件快速查找）
 │   │   │   ├── CsvHelper.cs             # CSV 读写
 │   │   │   └── IniHelper.cs             # INI 读写
 │   │   └── Models/
@@ -356,6 +357,12 @@ dotnet run --project MotionTest.WPF
 **配方管理 `RecipeManager`**
 - 基于 JSON 的配方（Recipe）读写、枚举、删除
 - 适配贴片机/固晶机不同产品的参数切换
+
+**文件索引搜索器 `FileIndexSearcher`**
+- 针对包含大量文件（20万+）的目录进行高效搜索
+- 根据索引值（如产品型号、序列号）匹配文件名
+- 返回时间最新的文件路径
+- 支持多索引值组合搜索、正则表达式搜索、旧文件清理
 
 **CSV / INI 辅助**
 - `CsvHelper.Write<T>` / `Read<T>`：对象列表与 CSV 互转
@@ -932,6 +939,45 @@ var recipe = new Recipe
 };
 recipeManager.Save(recipe);
 var loaded = recipeManager.Load("Product-A");
+```
+
+### 文件索引搜索器示例
+
+```csharp
+using CoreToolkit.Files.Helpers;
+
+// 创建搜索器（适用于包含大量文件的目录）
+var searcher = new FileIndexSearcher(@"D:\Data\Logs", ".txt");
+
+// 根据索引值查找最新的文件
+// 文件名格式示例：TUM126316D020_SZCCL249161010_20260408.txt
+var result = searcher.FindLatestFile("TUM126316D020");
+if (result.IsSuccess)
+{
+    Console.WriteLine($"最新文件: {result.Data}");
+}
+
+// 查找所有匹配的文件（按时间倒序）
+var allFiles = searcher.FindAllFiles("SZCCL");
+if (allFiles.IsSuccess)
+{
+    foreach (var file in allFiles.Data.Take(10))
+    {
+        Console.WriteLine($"{file.Name} - {file.LastWriteTime}");
+    }
+}
+
+// 多索引值搜索（AND条件）
+var multiResult = searcher.FindLatestFileByMultipleIndexes("TUM126316D020", "SZCCL");
+
+// 使用正则表达式搜索
+var regexResult = searcher.FindLatestFileByRegex(@"TUM\d+_SZCCL\d+");
+
+// 获取所有不同的索引值（根据文件名分隔符提取）
+var indexValues = searcher.GetAllIndexValues('_', 0);
+
+// 清理旧文件（只保留最新的N个）
+searcher.CleanupOldFiles("TUM126316D020", keepCount: 5);
 ```
 
 ### 扩展 CoreToolkit.Desktop

@@ -14,6 +14,10 @@ namespace CoreToolkit.Vision.Helpers
         /// <summary>
         /// 使用最小二乘法进行九点标定，返回 CoordinateTransform
         /// </summary>
+        /// <param name="points">标定数据点列表，至少需要3组数据</param>
+        /// <returns>坐标变换对象</returns>
+        /// <exception cref="ArgumentException">当标定数据点少于3组时抛出</exception>
+        /// <exception cref="InvalidOperationException">当标定点共线或数据异常时抛出</exception>
         public static CoordinateTransform NinePointCalibration(IList<CalibrationData> points)
         {
             if (points == null || points.Count < 3)
@@ -80,6 +84,8 @@ namespace CoreToolkit.Vision.Helpers
         /// <param name="angle2Deg">角度2（度）</param>
         /// <param name="x2">角度2对应的机械X</param>
         /// <param name="y2">角度2对应的机械Y</param>
+        /// <returns>旋转中心坐标 (cx, cy)</returns>
+        /// <exception cref="ArgumentException">当两个角度相同时抛出</exception>
         public static (double cx, double cy) CalculateRotationCenter(double angle1Deg, double x1, double y1, double angle2Deg, double x2, double y2)
         {
             if (Math.Abs(angle1Deg - angle2Deg) < 1e-6)

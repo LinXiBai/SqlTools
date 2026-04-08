@@ -12,7 +12,14 @@ namespace CoreToolkit.Vision.Helpers
         private double _cosAngle = 1.0;
         private double _sinAngle = 0.0;
 
-        public double ScaleX { get; set; } = 1.0;   // 像素/微米 或 像素/毫米
+        /// <summary>
+        /// X轴缩放比例（像素/微米 或 像素/毫米）
+        /// </summary>
+        public double ScaleX { get; set; } = 1.0;
+        
+        /// <summary>
+        /// Y轴缩放比例（像素/微米 或 像素/毫米）
+        /// </summary>
         public double ScaleY { get; set; } = 1.0;
 
         /// <summary>
@@ -29,7 +36,14 @@ namespace CoreToolkit.Vision.Helpers
             }
         }
 
-        public double OffsetX { get; set; } = 0.0;  // 平移偏移
+        /// <summary>
+        /// X轴平移偏移
+        /// </summary>
+        public double OffsetX { get; set; } = 0.0;
+        
+        /// <summary>
+        /// Y轴平移偏移
+        /// </summary>
         public double OffsetY { get; set; } = 0.0;
 
         /// <summary>

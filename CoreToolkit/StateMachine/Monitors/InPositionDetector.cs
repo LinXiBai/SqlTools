@@ -17,6 +17,10 @@ namespace CoreToolkit.StateMachine.Monitors
     {
         private readonly IMotionCard _motionCard;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="motionCard">运动控制卡实例</param>
         public InPositionDetector(IMotionCard motionCard)
         {
             _motionCard = motionCard ?? throw new ArgumentNullException(nameof(motionCard));
@@ -184,6 +188,10 @@ namespace CoreToolkit.StateMachine.Monitors
     {
         private readonly IIOCard _ioCard;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="ioCard">IO卡实例</param>
         public IOSignalDetector(IIOCard ioCard)
         {
             _ioCard = ioCard ?? throw new ArgumentNullException(nameof(ioCard));
@@ -192,6 +200,9 @@ namespace CoreToolkit.StateMachine.Monitors
         /// <summary>
         /// 等待IO信号
         /// </summary>
+        /// <param name="config">信号配置</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>是否成功</returns>
         public async Task<bool> WaitForSignalAsync(
             IOSignalConfig config,
             CancellationToken cancellationToken)
@@ -204,6 +215,8 @@ namespace CoreToolkit.StateMachine.Monitors
         /// </summary>
         /// <param name="configs">信号配置</param>
         /// <param name="waitForAll">true=等待所有信号, false=等待任意信号</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>是否成功</returns>
         public async Task<bool> WaitForSignalsAsync(
             IOSignalConfig[] configs,
             bool waitForAll,

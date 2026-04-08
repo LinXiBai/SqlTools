@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.IO;
 using System.Security.Cryptography;
 using System.Text;
@@ -151,6 +151,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 将机器码信息序列化为 JSON 字符串
         /// </summary>
+        /// <param name="machineCode">机器码信息对象</param>
+        /// <returns>序列化后的 JSON 字符串</returns>
+        /// <exception cref="ArgumentNullException">当 machineCode 为 null 时抛出</exception>
         public static string SerializeMachineCode(MachineCodeInfo machineCode)
         {
             if (machineCode == null)
@@ -162,6 +165,10 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 将机器码信息序列化为 JSON 字符串并加密
         /// </summary>
+        /// <param name="machineCode">机器码信息对象</param>
+        /// <param name="key">加密密钥，为 null 时使用默认密钥</param>
+        /// <returns>加密后的字符串</returns>
+        /// <exception cref="ArgumentNullException">当 machineCode 为 null 时抛出</exception>
         public static string SerializeMachineCodeEncrypted(MachineCodeInfo machineCode, string key = null)
         {
             string json = SerializeMachineCode(machineCode);
@@ -171,6 +178,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 从 JSON 字符串反序列化机器码信息
         /// </summary>
+        /// <param name="json">JSON 字符串</param>
+        /// <returns>反序列化后的 MachineCodeInfo 对象，失败时返回 null</returns>
         public static MachineCodeInfo DeserializeMachineCode(string json)
         {
             if (string.IsNullOrEmpty(json))
@@ -189,6 +198,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 从加密字符串解密并反序列化机器码信息
         /// </summary>
+        /// <param name="encryptedData">加密的字符串</param>
+        /// <param name="key">解密密钥，为 null 时使用默认密钥</param>
+        /// <returns>反序列化后的 MachineCodeInfo 对象，失败时返回 null</returns>
         public static MachineCodeInfo DeserializeMachineCodeEncrypted(string encryptedData, string key = null)
         {
             if (string.IsNullOrEmpty(encryptedData))
@@ -208,6 +220,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 生成机器码信息（从当前系统）
         /// </summary>
+        /// <param name="extraInfo">额外信息</param>
+        /// <returns>生成的 MachineCodeInfo 对象</returns>
         public static MachineCodeInfo GenerateMachineCode(string extraInfo = null)
         {
             var info = new MachineCodeInfo
@@ -245,6 +259,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 生成机器码指纹（用于比对）
         /// </summary>
+        /// <param name="machineCode">机器码信息对象</param>
+        /// <returns>机器码指纹哈希值</returns>
         public static string GenerateMachineFingerprint(MachineCodeInfo machineCode)
         {
             if (machineCode == null)
@@ -270,6 +286,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 将授权码信息序列化为 JSON 字符串
         /// </summary>
+        /// <param name="licenseCode">授权码信息对象</param>
+        /// <returns>序列化后的 JSON 字符串</returns>
+        /// <exception cref="ArgumentNullException">当 licenseCode 为 null 时抛出</exception>
         public static string SerializeLicenseCode(LicenseCodeInfo licenseCode)
         {
             if (licenseCode == null)
@@ -281,6 +300,10 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 将授权码信息序列化为 JSON 字符串并加密
         /// </summary>
+        /// <param name="licenseCode">授权码信息对象</param>
+        /// <param name="key">加密密钥，为 null 时使用默认密钥</param>
+        /// <returns>加密后的字符串</returns>
+        /// <exception cref="ArgumentNullException">当 licenseCode 为 null 时抛出</exception>
         public static string SerializeLicenseCodeEncrypted(LicenseCodeInfo licenseCode, string key = null)
         {
             string json = SerializeLicenseCode(licenseCode);
@@ -290,6 +313,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 从 JSON 字符串反序列化授权码信息
         /// </summary>
+        /// <param name="json">JSON 字符串</param>
+        /// <returns>反序列化后的 LicenseCodeInfo 对象，失败时返回 null</returns>
         public static LicenseCodeInfo DeserializeLicenseCode(string json)
         {
             if (string.IsNullOrEmpty(json))
@@ -308,6 +333,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 从加密字符串解密并反序列化授权码信息
         /// </summary>
+        /// <param name="encryptedData">加密的字符串</param>
+        /// <param name="key">解密密钥，为 null 时使用默认密钥</param>
+        /// <returns>反序列化后的 LicenseCodeInfo 对象，失败时返回 null</returns>
         public static LicenseCodeInfo DeserializeLicenseCodeEncrypted(string encryptedData, string key = null)
         {
             if (string.IsNullOrEmpty(encryptedData))
@@ -327,6 +355,13 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 创建授权码信息
         /// </summary>
+        /// <param name="type">授权类型</param>
+        /// <param name="validDays">有效天数（永久授权时忽略）</param>
+        /// <param name="features">授权功能列表（逗号分隔）</param>
+        /// <param name="version">授权版本号</param>
+        /// <param name="maxDevices">最大设备数量</param>
+        /// <param name="extraInfo">额外信息</param>
+        /// <returns>创建的 LicenseCodeInfo 对象</returns>
         public static LicenseCodeInfo CreateLicenseCode(LicenseType type, int validDays, string features = null, 
             string version = "1.0", int? maxDevices = null, string extraInfo = null)
         {
@@ -352,6 +387,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 验证授权码是否有效
         /// </summary>
+        /// <param name="licenseCode">授权码信息对象</param>
+        /// <param name="errorMessage">错误信息（输出参数）</param>
+        /// <returns>如果授权码有效返回 true，否则返回 false</returns>
         public static bool ValidateLicenseCode(LicenseCodeInfo licenseCode, out string errorMessage)
         {
             errorMessage = null;
@@ -386,6 +424,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 检查授权码是否在有效期内
         /// </summary>
+        /// <param name="licenseCode">授权码信息对象</param>
+        /// <returns>如果授权码在有效期内返回 true，否则返回 false</returns>
         public static bool IsLicenseValid(LicenseCodeInfo licenseCode)
         {
             if (licenseCode == null)
@@ -403,6 +443,8 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 获取授权码剩余天数
         /// </summary>
+        /// <param name="licenseCode">授权码信息对象</param>
+        /// <returns>剩余天数，永久授权返回 int.MaxValue</returns>
         public static int GetRemainingDays(LicenseCodeInfo licenseCode)
         {
             if (licenseCode == null)
@@ -425,6 +467,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 加密字符串
         /// </summary>
+        /// <param name="plainText">要加密的明文</param>
+        /// <param name="key">加密密钥（会被自动调整为 32 字节）</param>
+        /// <returns>加密后的 Base64 字符串</returns>
         public static string Encrypt(string plainText, string key)
         {
             if (string.IsNullOrEmpty(plainText))
@@ -454,6 +499,9 @@ namespace CoreToolkit.Common
         /// <summary>
         /// 解密字符串
         /// </summary>
+        /// <param name="cipherText">要解密的 Base64 字符串</param>
+        /// <param name="key">解密密钥（会被自动调整为 32 字节）</param>
+        /// <returns>解密后的明文，失败时返回 null</returns>
         public static string Decrypt(string cipherText, string key)
         {
             if (string.IsNullOrEmpty(cipherText))

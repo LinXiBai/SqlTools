@@ -20,13 +20,17 @@ namespace CoreToolkit.Tests
             Console.WriteLine("  2. PCI-1285 运动控制卡测试");
             Console.WriteLine("  3. 轴组/插补/PTP/PVT测试");
             Console.WriteLine("  4. 状态机测试（组装流程）");
+            Console.WriteLine("  5. 文件索引搜索器测试（20万文件）");
             Console.WriteLine();
-            Console.Write("请输入选项 (1-4，默认1): ");
+            Console.Write("请输入选项 (1-5，默认1): ");
             
             string choice = Console.ReadLine()?.Trim() ?? "1";
             
             switch (choice)
             {
+                case "5":
+                    RunFileIndexSearcherQuickTest();
+                    break;
                 case "4":
                     await RunStateMachineTestAsync();
                     break;
@@ -380,6 +384,21 @@ namespace CoreToolkit.Tests
         {
             var test = new StateMachineTest();
             await test.RunAssemblyTestAsync();
+            
+            Console.WriteLine();
+            Console.WriteLine("按任意键退出...");
+            Console.ReadKey();
+        }
+
+        /// <summary>
+        /// 运行文件索引搜索器完整测试（20万文件）
+        /// </summary>
+        static void RunFileIndexSearcherQuickTest()
+        {
+            // 使用debug目录下的TestData目录，方便后续使用
+            string testDir = Path.Combine(AppDomain.CurrentDomain.BaseDirectory, "TestData", "FileIndexSearch_200k");
+            var test = new FileIndexSearcherQuickTest(testDir);
+            test.RunTest(fileCount: 200000);
             
             Console.WriteLine();
             Console.WriteLine("按任意键退出...");

@@ -224,9 +224,19 @@ namespace CoreToolkit.StateMachine.Core
         private ExecutionContext _executionContext;
         private readonly Stopwatch _executionTimer = new Stopwatch();
 
+        /// <summary>
+        /// 状态机名称
+        /// </summary>
         public string Name { get; }
+        
+        /// <summary>
+        /// 状态机描述
+        /// </summary>
         public string Description { get; set; }
         
+        /// <summary>
+        /// 状态机状态
+        /// </summary>
         public StateMachineStatus Status
         {
             get => _status;
@@ -246,9 +256,24 @@ namespace CoreToolkit.StateMachine.Core
             }
         }
 
+        /// <summary>
+        /// 启动时间
+        /// </summary>
         public DateTime StartTime { get; private set; }
+        
+        /// <summary>
+        /// 执行时间
+        /// </summary>
         public TimeSpan ExecutionTime => _executionTimer.Elapsed;
+        
+        /// <summary>
+        /// 错误信息
+        /// </summary>
         public string ErrorMessage { get; private set; }
+        
+        /// <summary>
+        /// 模块列表
+        /// </summary>
         public IReadOnlyList<IFlowModule> Modules => _modules;
 
         /// <summary>状态变更事件</summary>
@@ -260,6 +285,11 @@ namespace CoreToolkit.StateMachine.Core
         /// <summary>超时事件</summary>
         public event EventHandler<TimeoutEventArgs> OnTimeoutOccurred;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">状态机名称</param>
+        /// <param name="description">状态机描述</param>
         public StateMachine(string name, string description = null)
         {
             Name = name;
@@ -482,6 +512,9 @@ namespace CoreToolkit.StateMachine.Core
             }
         }
 
+        /// <summary>
+        /// 释放资源
+        /// </summary>
         public void Dispose()
         {
             if (_disposed) return;
@@ -498,13 +531,44 @@ namespace CoreToolkit.StateMachine.Core
     /// </summary>
     public class GlobalStatistics
     {
+        /// <summary>
+        /// 总流程次数
+        /// </summary>
         public int TotalFlowCount { get; set; }
+        
+        /// <summary>
+        /// 成功次数
+        /// </summary>
         public int SuccessCount { get; set; }
+        
+        /// <summary>
+        /// 失败次数
+        /// </summary>
         public int FailedCount { get; set; }
+        
+        /// <summary>
+        /// 总执行时间
+        /// </summary>
         public TimeSpan TotalExecutionTime { get; set; }
+        
+        /// <summary>
+        /// 平均执行时间
+        /// </summary>
         public TimeSpan AverageExecutionTime { get; set; }
+        
+        /// <summary>
+        /// 最大执行时间
+        /// </summary>
         public TimeSpan MaxExecutionTime { get; set; }
+        
+        /// <summary>
+        /// 最小执行时间
+        /// </summary>
         public TimeSpan MinExecutionTime { get; set; }
+        
+        /// <summary>
+        /// 成功率
+        /// </summary>
         public double SuccessRate => TotalFlowCount > 0 ? (double)SuccessCount / TotalFlowCount * 100 : 0;
     }
 }

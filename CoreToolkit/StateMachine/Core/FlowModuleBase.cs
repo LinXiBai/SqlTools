@@ -19,9 +19,24 @@ namespace CoreToolkit.StateMachine.Core
         protected readonly Stopwatch _executionTimer = new Stopwatch();
         protected readonly Stopwatch _waitTimer = new Stopwatch();
 
+        /// <summary>
+        /// 模块ID
+        /// </summary>
         public string ModuleId { get; protected set; } = Guid.NewGuid().ToString("N").Substring(0, 8);
+        
+        /// <summary>
+        /// 模块名称
+        /// </summary>
         public string Name { get; set; }
+        
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public abstract ModuleType Type { get; }
+        
+        /// <summary>
+        /// 模块状态
+        /// </summary>
         public ModuleStatus Status
         {
             get
@@ -58,14 +73,41 @@ namespace CoreToolkit.StateMachine.Core
                 });
             }
         }
+        
+        /// <summary>
+        /// 超时时间（毫秒）
+        /// </summary>
         public int TimeoutMs { get; set; } = 30000;
+        
+        /// <summary>
+        /// 是否并行执行
+        /// </summary>
         public bool IsParallel { get; set; } = false;
+        
+        /// <summary>
+        /// 父模块
+        /// </summary>
         public IFlowModule Parent { get; set; }
+        
+        /// <summary>
+        /// 模块统计信息
+        /// </summary>
         public ModuleStatistics Statistics { get; protected set; } = new ModuleStatistics();
 
+        /// <summary>
+        /// 状态变更事件
+        /// </summary>
         public event EventHandler<ModuleEventArgs> OnStatusChanged;
+        
+        /// <summary>
+        /// 进度变更事件
+        /// </summary>
         public event EventHandler<double> OnProgressChanged;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">模块名称</param>
         protected FlowModuleBase(string name)
         {
             Name = name ?? GetType().Name;
@@ -74,6 +116,11 @@ namespace CoreToolkit.StateMachine.Core
             Statistics.Type = Type;
         }
 
+        /// <summary>
+        /// 执行模块
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <returns>执行结果</returns>
         public virtual async Task<bool> ExecuteAsync(ExecutionContext context)
         {
             if (Status == ModuleStatus.Running || Status == ModuleStatus.Completed)
@@ -195,6 +242,9 @@ namespace CoreToolkit.StateMachine.Core
         /// </summary>
         protected abstract Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken);
 
+        /// <summary>
+        /// 取消执行
+        /// </summary>
         public virtual void Cancel()
         {
             _cts?.Cancel();
@@ -204,6 +254,9 @@ namespace CoreToolkit.StateMachine.Core
             }
         }
 
+        /// <summary>
+        /// 重置模块
+        /// </summary>
         public virtual void Reset()
         {
             Cancel();
@@ -220,11 +273,18 @@ namespace CoreToolkit.StateMachine.Core
             _waitTimer.Reset();
         }
 
+        /// <summary>
+        /// 报告进度
+        /// </summary>
+        /// <param name="progress">进度值（0-1）</param>
         protected void ReportProgress(double progress)
         {
             OnProgressChanged?.Invoke(this, Math.Max(0, Math.Min(1, progress)));
         }
 
+        /// <summary>
+        /// 设置为等待状态
+        /// </summary>
         protected void SetWaitingState()
         {
             if (Status != ModuleStatus.Running) return;
@@ -232,6 +292,9 @@ namespace CoreToolkit.StateMachine.Core
             _waitTimer.Start();
         }
 
+        /// <summary>
+        /// 设置为运行状态
+        /// </summary>
         protected void SetRunningState()
         {
             if (Status != ModuleStatus.Waiting) return;
@@ -261,11 +324,15 @@ namespace CoreToolkit.StateMachine.Core
         /// <summary>
         /// 超时事件 - 受保护的虚方法供子类调用
         /// </summary>
+        /// <param name="e">超时事件参数</param>
         protected virtual void OnRaiseTimeoutOccurred(TimeoutEventArgs e)
         {
             OnTimeoutOccurred?.Invoke(this, e);
         }
         
+        /// <summary>
+        /// 超时事件
+        /// </summary>
         public event EventHandler<TimeoutEventArgs> OnTimeoutOccurred;
     }
 }

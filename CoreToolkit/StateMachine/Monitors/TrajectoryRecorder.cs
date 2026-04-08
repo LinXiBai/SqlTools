@@ -20,14 +20,29 @@ namespace CoreToolkit.StateMachine.Monitors
         private CancellationTokenSource _cts;
         private readonly Stopwatch _sw = new Stopwatch();
 
+        /// <summary>
+        /// 轨迹记录
+        /// </summary>
         public TrajectoryRecord Record { get; private set; }
+        
+        /// <summary>
+        /// 是否正在记录
+        /// </summary>
         public bool IsRecording { get; private set; }
 
+        /// <summary>
+        /// 构造函数（使用运动控制卡）
+        /// </summary>
+        /// <param name="motionCard">运动控制卡实例</param>
         public TrajectoryRecorder(IMotionCard motionCard)
         {
             _motionCard = motionCard;
         }
 
+        /// <summary>
+        /// 构造函数（使用轴组）
+        /// </summary>
+        /// <param name="axisGroup">轴组实例</param>
         public TrajectoryRecorder(IAxisGroup axisGroup)
         {
             _axisGroup = axisGroup;

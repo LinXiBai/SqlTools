@@ -38,12 +38,21 @@ namespace CoreToolkit.Files.Helpers
             return Path.GetFileName(recipeName);
         }
 
+        /// <summary>
+        /// 获取配方文件路径
+        /// </summary>
+        /// <param name="recipeName">配方名称</param>
+        /// <returns>配方文件的完整路径</returns>
         public string GetRecipePath(string recipeName)
         {
             string safeName = ValidateRecipeName(recipeName);
             return Path.Combine(_recipeDirectory, $"{safeName}.json");
         }
 
+        /// <summary>
+        /// 保存配方
+        /// </summary>
+        /// <param name="recipe">配方对象</param>
         public void Save(Recipe recipe)
         {
             if (recipe == null) throw new ArgumentNullException(nameof(recipe));
@@ -61,6 +70,11 @@ namespace CoreToolkit.Files.Helpers
             }
         }
 
+        /// <summary>
+        /// 加载配方
+        /// </summary>
+        /// <param name="recipeName">配方名称</param>
+        /// <returns>配方对象，如果不存在则返回null</returns>
         public Recipe Load(string recipeName)
         {
             _lock.EnterReadLock();
@@ -77,6 +91,10 @@ namespace CoreToolkit.Files.Helpers
             }
         }
 
+        /// <summary>
+        /// 获取所有配方名称
+        /// </summary>
+        /// <returns>配方名称数组</returns>
         public string[] GetRecipeNames()
         {
             _lock.EnterReadLock();
@@ -93,6 +111,10 @@ namespace CoreToolkit.Files.Helpers
             }
         }
 
+        /// <summary>
+        /// 删除配方
+        /// </summary>
+        /// <param name="recipeName">配方名称</param>
         public void Delete(string recipeName)
         {
             _lock.EnterWriteLock();
@@ -108,6 +130,11 @@ namespace CoreToolkit.Files.Helpers
             }
         }
 
+        /// <summary>
+        /// 检查配方是否存在
+        /// </summary>
+        /// <param name="recipeName">配方名称</param>
+        /// <returns>配方是否存在</returns>
         public bool Exists(string recipeName)
         {
             _lock.EnterReadLock();

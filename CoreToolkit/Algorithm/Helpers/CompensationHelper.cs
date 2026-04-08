@@ -11,6 +11,11 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 双线性插值补偿
         /// </summary>
+        /// <param name="x">输入 X 坐标</param>
+        /// <param name="y">输入 Y 坐标</param>
+        /// <param name="gridPoints">网格点坐标列表</param>
+        /// <param name="errors">对应网格点的误差值</param>
+        /// <returns>补偿后的坐标偏移量</returns>
         public static (double cx, double cy) BilinearCompensate(
             double x, double y,
             IList<Point2D> gridPoints,
@@ -39,6 +44,10 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 一维线性补偿（常用于贴片机单轴补偿表）
         /// </summary>
+        /// <param name="input">输入值</param>
+        /// <param name="positions">位置点列表</param>
+        /// <param name="errors">对应位置点的误差值</param>
+        /// <returns>补偿值</returns>
         public static double LinearCompensate(double input, IList<double> positions, IList<double> errors)
         {
             if (positions.Count == 0 || positions.Count != errors.Count) return 0;

@@ -207,6 +207,13 @@ namespace CoreToolkit.StateMachine.Models
         /// <summary>父上下文</summary>
         public ExecutionContext ParentContext { get; set; }
 
+        /// <summary>
+        /// 获取参数
+        /// </summary>
+        /// <typeparam name="T">参数类型</typeparam>
+        /// <param name="key">参数键</param>
+        /// <param name="defaultValue">默认值</param>
+        /// <returns>参数值</returns>
         public T GetParameter<T>(string key, T defaultValue = default)
         {
             if (Parameters.TryGetValue(key, out var value) && value is T t)
@@ -214,11 +221,24 @@ namespace CoreToolkit.StateMachine.Models
             return defaultValue;
         }
 
+        /// <summary>
+        /// 设置结果
+        /// </summary>
+        /// <typeparam name="T">结果类型</typeparam>
+        /// <param name="key">结果键</param>
+        /// <param name="value">结果值</param>
         public void SetResult<T>(string key, T value)
         {
             Results[key] = value;
         }
 
+        /// <summary>
+        /// 获取结果
+        /// </summary>
+        /// <typeparam name="T">结果类型</typeparam>
+        /// <param name="key">结果键</param>
+        /// <param name="defaultValue">默认值</param>
+        /// <returns>结果值</returns>
         public T GetResult<T>(string key, T defaultValue = default)
         {
             if (Results.TryGetValue(key, out var value) && value is T t)

@@ -8,11 +8,21 @@ namespace CoreToolkit.Algorithm.Helpers
     /// </summary>
     public static class GeometryHelper
     {
+        /// <summary>
+        /// 角度转弧度
+        /// </summary>
+        /// <param name="degrees">角度值</param>
+        /// <returns>弧度值</returns>
         public static double DegreesToRadians(double degrees)
         {
             return degrees * Math.PI / 180.0;
         }
 
+        /// <summary>
+        /// 弧度转角度
+        /// </summary>
+        /// <param name="radians">弧度值</param>
+        /// <returns>角度值</returns>
         public static double RadiansToDegrees(double radians)
         {
             return radians * 180.0 / Math.PI;
@@ -21,6 +31,11 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 两点间距离
         /// </summary>
+        /// <param name="x1">第一个点的 X 坐标</param>
+        /// <param name="y1">第一个点的 Y 坐标</param>
+        /// <param name="x2">第二个点的 X 坐标</param>
+        /// <param name="y2">第二个点的 Y 坐标</param>
+        /// <returns>两点之间的距离</returns>
         public static double Distance(double x1, double y1, double x2, double y2)
         {
             double dx = x2 - x1, dy = y2 - y1;
@@ -30,6 +45,12 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 点绕中心旋转后的新坐标
         /// </summary>
+        /// <param name="px">要旋转的点的 X 坐标</param>
+        /// <param name="py">要旋转的点的 Y 坐标</param>
+        /// <param name="cx">旋转中心的 X 坐标</param>
+        /// <param name="cy">旋转中心的 Y 坐标</param>
+        /// <param name="angleRad">旋转角度（弧度）</param>
+        /// <returns>旋转后的新坐标</returns>
         public static (double x, double y) RotatePoint(double px, double py, double cx, double cy, double angleRad)
         {
             double cos = Math.Cos(angleRad);
@@ -44,6 +65,13 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 求两直线交点（已知两点和角度）
         /// </summary>
+        /// <param name="x1">第一条直线上一点的 X 坐标</param>
+        /// <param name="y1">第一条直线上一点的 Y 坐标</param>
+        /// <param name="angle1Rad">第一条直线的角度（弧度）</param>
+        /// <param name="x2">第二条直线上一点的 X 坐标</param>
+        /// <param name="y2">第二条直线上一点的 Y 坐标</param>
+        /// <param name="angle2Rad">第二条直线的角度（弧度）</param>
+        /// <returns>两直线的交点，如果平行则返回 null</returns>
         public static Point2D? Intersection(double x1, double y1, double angle1Rad, double x2, double y2, double angle2Rad)
         {
             // 方向向量
@@ -67,6 +95,13 @@ namespace CoreToolkit.Algorithm.Helpers
         /// <summary>
         /// 三点求圆心
         /// </summary>
+        /// <param name="x1">第一个点的 X 坐标</param>
+        /// <param name="y1">第一个点的 Y 坐标</param>
+        /// <param name="x2">第二个点的 X 坐标</param>
+        /// <param name="y2">第二个点的 Y 坐标</param>
+        /// <param name="x3">第三个点的 X 坐标</param>
+        /// <param name="y3">第三个点的 Y 坐标</param>
+        /// <returns>圆心坐标，如果三点共线则返回 null</returns>
         public static Point2D? CircleCenter(double x1, double y1, double x2, double y2, double x3, double y3)
         {
             double a = x2 - x1, b = y2 - y1, c = x3 - x1, d = y3 - y1;

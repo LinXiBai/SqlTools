@@ -20,21 +20,63 @@ namespace CoreToolkit.StateMachine.Modules
     {
         private readonly IIOCard _ioCard;
 
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.IOOutput;
+        
+        /// <summary>
+        /// IO索引
+        /// </summary>
         public int IoIndex { get; set; }
+        
+        /// <summary>
+        /// 输出状态
+        /// </summary>
         public bool OutputState { get; set; }
+        
+        /// <summary>
+        /// 设置后延迟时间（毫秒）
+        /// </summary>
         public int DelayAfterSetMs { get; set; }
+        
+        /// <summary>
+        /// 是否检查反馈
+        /// </summary>
         public bool CheckFeedback { get; set; }
+        
+        /// <summary>
+        /// 反馈IO索引
+        /// </summary>
         public int FeedbackIoIndex { get; set; } = -1;
+        
+        /// <summary>
+        /// 期望的反馈状态
+        /// </summary>
         public bool ExpectedFeedbackState { get; set; }
+        
+        /// <summary>
+        /// 反馈超时时间（毫秒）
+        /// </summary>
         public int FeedbackTimeoutMs { get; set; } = 1000;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="ioCard">IO卡实例</param>
+        /// <param name="name">模块名称</param>
         public IOOutputModule(IIOCard ioCard, string name = null) : base(name ?? "IOOutput")
         {
             _ioCard = ioCard ?? throw new ArgumentNullException(nameof(ioCard));
             TimeoutMs = 5000;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             // 设置输出
@@ -96,18 +138,48 @@ namespace CoreToolkit.StateMachine.Modules
     {
         private readonly IIOCard _ioCard;
 
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.IOInput;
+        
+        /// <summary>
+        /// IO索引
+        /// </summary>
         public int IoIndex { get; set; }
+        
+        /// <summary>
+        /// 期望状态
+        /// </summary>
         public bool ExpectedState { get; set; } = true;
+        
+        /// <summary>
+        /// 检查间隔（毫秒）
+        /// </summary>
         public int CheckIntervalMs { get; set; } = 10;
+        
+        /// <summary>
+        /// 稳定时间（毫秒）
+        /// </summary>
         public int StableTimeMs { get; set; } = 0;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="ioCard">IO卡实例</param>
+        /// <param name="name">模块名称</param>
         public IOInputModule(IIOCard ioCard, string name = null) : base(name ?? "IOInput")
         {
             _ioCard = ioCard ?? throw new ArgumentNullException(nameof(ioCard));
             TimeoutMs = 10000;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             SetWaitingState();
@@ -182,10 +254,26 @@ namespace CoreToolkit.StateMachine.Modules
         private readonly IMotionCard _motionCard;
         private readonly InPositionDetector _detector;
 
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.InPositionCheck;
+        
+        /// <summary>
+        /// 到位检测配置数组
+        /// </summary>
         public InPositionConfig[] Configs { get; set; }
+        
+        /// <summary>
+        /// 目标位置数组
+        /// </summary>
         public double[] TargetPositions { get; set; }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="motionCard">运动控制卡实例</param>
+        /// <param name="name">模块名称</param>
         public InPositionModule(IMotionCard motionCard, string name = null) : base(name ?? "InPosition")
         {
             _motionCard = motionCard ?? throw new ArgumentNullException(nameof(motionCard));
@@ -193,6 +281,12 @@ namespace CoreToolkit.StateMachine.Modules
             TimeoutMs = 30000;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             if (Configs == null || Configs.Length == 0)
@@ -267,22 +361,59 @@ namespace CoreToolkit.StateMachine.Modules
         {
             public int IoIndex { get; set; }
             public bool IsInput { get; set; }
+            /// <summary>
+            /// 设置值
+            /// </summary>
             public bool SetValue { get; set; }
+            
+            /// <summary>
+            /// 期望值
+            /// </summary>
             public bool ExpectedValue { get; set; }
+            
+            /// <summary>
+            /// 操作前延迟（毫秒）
+            /// </summary>
             public int DelayBeforeMs { get; set; }
+            
+            /// <summary>
+            /// 操作后延迟（毫秒）
+            /// </summary>
             public int DelayAfterMs { get; set; }
         }
 
+        /// <summary>
+        /// IO操作列表
+        /// </summary>
         public List<IOOperation> Operations { get; set; } = new List<IOOperation>();
+        
+        /// <summary>
+        /// 是否并行执行
+        /// </summary>
         public bool ParallelExecution { get; set; } = false;
+        
+        /// <summary>
+        /// 是否等待所有输入信号
+        /// </summary>
         public bool WaitForAllInputs { get; set; } = true;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="ioCard">IO卡实例</param>
+        /// <param name="name">模块名称</param>
         public CompositeIOModule(IIOCard ioCard, string name = null) : base(name ?? "CompositeIO")
         {
             _ioCard = ioCard ?? throw new ArgumentNullException(nameof(ioCard));
             TimeoutMs = 10000;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             if (Operations.Count == 0)

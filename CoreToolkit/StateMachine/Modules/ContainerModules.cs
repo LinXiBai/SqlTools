@@ -16,17 +16,36 @@ namespace CoreToolkit.StateMachine.Modules
     public class SequentialModule : FlowModuleBase
     {
         private readonly List<IFlowModule> _modules = new List<IFlowModule>();
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.Sequential;
+        
+        /// <summary>
+        /// 子模块列表
+        /// </summary>
         public IReadOnlyList<IFlowModule> Modules => _modules;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">模块名称</param>
         public SequentialModule(string name = null) : base(name ?? "Sequential") { }
 
+        /// <summary>
+        /// 添加子模块
+        /// </summary>
+        /// <param name="module">子模块</param>
         public void AddModule(IFlowModule module)
         {
             module.Parent = this;
             _modules.Add(module);
         }
 
+        /// <summary>
+        /// 批量添加子模块
+        /// </summary>
+        /// <param name="modules">子模块集合</param>
         public void AddRange(IEnumerable<IFlowModule> modules)
         {
             foreach (var module in modules)
@@ -35,22 +54,41 @@ namespace CoreToolkit.StateMachine.Modules
             }
         }
 
+        /// <summary>
+        /// 插入子模块
+        /// </summary>
+        /// <param name="index">插入位置</param>
+        /// <param name="module">子模块</param>
         public void InsertModule(int index, IFlowModule module)
         {
             module.Parent = this;
             _modules.Insert(index, module);
         }
 
+        /// <summary>
+        /// 移除子模块
+        /// </summary>
+        /// <param name="module">子模块</param>
+        /// <returns>是否移除成功</returns>
         public bool RemoveModule(IFlowModule module)
         {
             return _modules.Remove(module);
         }
 
+        /// <summary>
+        /// 清空子模块
+        /// </summary>
         public void ClearModules()
         {
             _modules.Clear();
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             for (int i = 0; i < _modules.Count; i++)
@@ -112,12 +150,31 @@ namespace CoreToolkit.StateMachine.Modules
     public class ParallelModule : FlowModuleBase
     {
         private readonly List<IFlowModule> _modules = new List<IFlowModule>();
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.Parallel;
+        
+        /// <summary>
+        /// 子模块列表
+        /// </summary>
         public IReadOnlyList<IFlowModule> Modules => _modules;
+        
+        /// <summary>
+        /// 并行执行选项
+        /// </summary>
         public ParallelOptions ParallelOptions { get; set; } = new ParallelOptions();
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">模块名称</param>
         public ParallelModule(string name = null) : base(name ?? "Parallel") { }
 
+        /// <summary>
+        /// 添加子模块
+        /// </summary>
+        /// <param name="module">子模块</param>
         public void AddModule(IFlowModule module)
         {
             module.Parent = this;
@@ -125,6 +182,10 @@ namespace CoreToolkit.StateMachine.Modules
             _modules.Add(module);
         }
 
+        /// <summary>
+        /// 批量添加子模块
+        /// </summary>
+        /// <param name="modules">子模块集合</param>
         public void AddRange(IEnumerable<IFlowModule> modules)
         {
             foreach (var module in modules)
@@ -133,16 +194,30 @@ namespace CoreToolkit.StateMachine.Modules
             }
         }
 
+        /// <summary>
+        /// 移除子模块
+        /// </summary>
+        /// <param name="module">子模块</param>
+        /// <returns>是否移除成功</returns>
         public bool RemoveModule(IFlowModule module)
         {
             return _modules.Remove(module);
         }
 
+        /// <summary>
+        /// 清空子模块
+        /// </summary>
         public void ClearModules()
         {
             _modules.Clear();
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             var moduleList = _modules.ToList();
@@ -268,22 +343,44 @@ namespace CoreToolkit.StateMachine.Modules
             = new List<(Func<ExecutionContext, bool>, IFlowModule)>();
         private IFlowModule _elseModule;
 
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.Custom;
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">模块名称</param>
         public ConditionalModule(string name = null) : base(name ?? "Conditional") { }
 
+        /// <summary>
+        /// 添加条件分支
+        /// </summary>
+        /// <param name="condition">条件函数</param>
+        /// <param name="module">分支模块</param>
         public void AddBranch(Func<ExecutionContext, bool> condition, IFlowModule module)
         {
             module.Parent = this;
             _branches.Add((condition, module));
         }
 
+        /// <summary>
+        /// 设置默认分支
+        /// </summary>
+        /// <param name="module">默认分支模块</param>
         public void SetElseModule(IFlowModule module)
         {
             module.Parent = this;
             _elseModule = module;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             // 按顺序检查条件，执行第一个满足条件的分支
@@ -325,6 +422,9 @@ namespace CoreToolkit.StateMachine.Modules
             return true;
         }
 
+        /// <summary>
+        /// 取消执行
+        /// </summary>
         public override void Cancel()
         {
             base.Cancel();
@@ -335,6 +435,9 @@ namespace CoreToolkit.StateMachine.Modules
             _elseModule?.Cancel();
         }
 
+        /// <summary>
+        /// 重置模块
+        /// </summary>
         public override void Reset()
         {
             base.Reset();
@@ -356,27 +459,56 @@ namespace CoreToolkit.StateMachine.Modules
         private Func<ExecutionContext, int, bool> _loopCondition;
         private int _maxIterations = int.MaxValue;
 
+        /// <summary>
+        /// 模块类型
+        /// </summary>
         public override ModuleType Type => ModuleType.Custom;
+        
+        /// <summary>
+        /// 迭代次数
+        /// </summary>
         public int IterationCount { get; private set; }
 
+        /// <summary>
+        /// 构造函数
+        /// </summary>
+        /// <param name="name">模块名称</param>
         public LoopModule(string name = null) : base(name ?? "Loop") { }
 
+        /// <summary>
+        /// 设置循环体
+        /// </summary>
+        /// <param name="module">循环体模块</param>
         public void SetBody(IFlowModule module)
         {
             module.Parent = this;
             _bodyModule = module;
         }
 
+        /// <summary>
+        /// 设置循环条件
+        /// </summary>
+        /// <param name="condition">条件函数，参数为执行上下文和当前迭代次数</param>
         public void SetCondition(Func<ExecutionContext, int, bool> condition)
         {
             _loopCondition = condition;
         }
 
+        /// <summary>
+        /// 设置最大迭代次数
+        /// </summary>
+        /// <param name="max">最大迭代次数</param>
         public void SetMaxIterations(int max)
         {
             _maxIterations = max;
         }
 
+        /// <summary>
+        /// 执行模块逻辑
+        /// </summary>
+        /// <param name="context">执行上下文</param>
+        /// <param name="cancellationToken">取消令牌</param>
+        /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
             if (_bodyModule == null)
@@ -429,12 +561,18 @@ namespace CoreToolkit.StateMachine.Modules
             return true;
         }
 
+        /// <summary>
+        /// 取消执行
+        /// </summary>
         public override void Cancel()
         {
             base.Cancel();
             _bodyModule?.Cancel();
         }
 
+        /// <summary>
+        /// 重置模块
+        /// </summary>
         public override void Reset()
         {
             base.Reset();

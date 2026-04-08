@@ -40,6 +40,9 @@ namespace CoreToolkit.Communication.Helpers
             Port = port;
         }
 
+        /// <summary>
+        /// 启动TCP服务器
+        /// </summary>
         public void Start()
         {
             if (IsRunning) return;
@@ -53,6 +56,9 @@ namespace CoreToolkit.Communication.Helpers
             Log($"TCP 服务端已启动，端口 {Port}");
         }
 
+        /// <summary>
+        /// 停止TCP服务器
+        /// </summary>
         public void Stop()
         {
             if (!IsRunning) return;
@@ -76,6 +82,11 @@ namespace CoreToolkit.Communication.Helpers
             Log("TCP 服务端已停止");
         }
 
+        /// <summary>
+        /// 发送数据到指定客户端
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
+        /// <param name="data">要发送的数据</param>
         public void Send(string clientId, byte[] data)
         {
             if (!_clients.TryGetValue(clientId, out var client) || !client.Connected)
@@ -96,6 +107,12 @@ namespace CoreToolkit.Communication.Helpers
             }
         }
 
+        /// <summary>
+        /// 异步发送数据到指定客户端
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
+        /// <param name="data">要发送的数据</param>
+        /// <returns>异步任务</returns>
         public async Task SendAsync(string clientId, byte[] data)
         {
             if (!_clients.TryGetValue(clientId, out var client) || !client.Connected)
@@ -116,6 +133,10 @@ namespace CoreToolkit.Communication.Helpers
             }
         }
 
+        /// <summary>
+        /// 广播数据到所有客户端
+        /// </summary>
+        /// <param name="data">要广播的数据</param>
         public void Broadcast(byte[] data)
         {
             foreach (var clientId in _clients.Keys.ToList())
@@ -124,6 +145,10 @@ namespace CoreToolkit.Communication.Helpers
             }
         }
 
+        /// <summary>
+        /// 断开指定客户端连接
+        /// </summary>
+        /// <param name="clientId">客户端ID</param>
         public void DisconnectClient(string clientId)
         {
             if (_clients.TryRemove(clientId, out var client))
@@ -140,6 +165,10 @@ namespace CoreToolkit.Communication.Helpers
             Log($"客户端 {clientId} 已断开");
         }
 
+        /// <summary>
+        /// 获取所有连接的客户端ID
+        /// </summary>
+        /// <returns>客户端ID列表</returns>
         public List<string> GetConnectedClients()
         {
             return _clients.Keys.ToList();
