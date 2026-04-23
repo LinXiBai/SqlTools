@@ -12,7 +12,9 @@ namespace CoreToolkit.Data
         private string _operator;
         private string _projectNumber;
         private string _deviceNumber;
+        private string _deviceType;
         private string _machineCode;
+        private string _applicant;
 
         /// <summary>
         /// 记录时间
@@ -65,6 +67,16 @@ namespace CoreToolkit.Data
         }
 
         /// <summary>
+        /// 设备类型
+        /// </summary>
+        [Field("设备类型", "设备信息", ControlType.String)]
+        public string DeviceType
+        {
+            get { return _deviceType; }
+            set { SetProperty(ref _deviceType, value); }
+        }
+
+        /// <summary>
         /// 机器码（序列化存储）
         /// </summary>
         [Field("机器码", "授权信息", ControlType.String)]
@@ -72,6 +84,16 @@ namespace CoreToolkit.Data
         {
             get { return _machineCode; }
             set { SetProperty(ref _machineCode, value); }
+        }
+
+        /// <summary>
+        /// 申请人
+        /// </summary>
+        [Field("申请人", "授权信息", ControlType.String)]
+        public string Applicant
+        {
+            get { return _applicant; }
+            set { SetProperty(ref _applicant, value); }
         }
     }
 }

@@ -51,6 +51,7 @@ namespace TestMachineCode
                     RecordTime = DateTime.Now,
                     Department = "技术部",
                     Operator = "测试用户",
+                    Applicant = "申请人张三",
                     ProjectNumber = "TEST-20260408",
                     DeviceNumber = "高速贴片机-TEST001",
                     MachineCode = originalMachineCode

@@ -26,6 +26,7 @@ namespace LicenseManager.WPF
             RecordTimeText.Text = _record.RecordTime.ToString("yyyy-MM-dd HH:mm:ss");
             DepartmentText.Text = _record.Department;
             OperatorText.Text = _record.Operator;
+            ApplicantText.Text = _record.Applicant;
             ProjectNumberText.Text = _record.ProjectNumber;
             DeviceNumberText.Text = _record.DeviceNumber;
             CreatedAtText.Text = _record.CreatedAt.ToString("yyyy-MM-dd HH:mm:ss");
@@ -83,6 +84,7 @@ namespace LicenseManager.WPF
                         _record.RecordTime,
                         _record.Department,
                         _record.Operator,
+                        _record.Applicant,
                         _record.ProjectNumber,
                         _record.DeviceNumber,
                         _record.CreatedAt,

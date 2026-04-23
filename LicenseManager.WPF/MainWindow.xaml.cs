@@ -23,7 +23,9 @@ namespace LicenseManager.WPF
             { "高速贴片机", "GT" },
             { "猎奇耦合测试机", "LQ" },
             { "飞泰耦合测试机", "FT" },
-            { "芯片测试机", "XP" }
+            { "芯片测试机", "XP" },
+            { "个人电脑", "PC" },
+            { "共晶/固晶", "GJ" }
         };
 
         public MainWindow()
@@ -232,20 +234,24 @@ namespace LicenseManager.WPF
                     if (result == MessageBoxResult.No) return;
                 }
 
-                DateTime recordTime = RecordDatePicker.SelectedDate ?? DateTime.Now.Date;
-                if (TimeSpan.TryParse(RecordTimeText.Text, out TimeSpan time))
-                    recordTime = recordTime.Date + time;
+                // 自动使用当前时间
+                DateTime recordTime = DateTime.Now;
 
                 string deviceType = ((DeviceTypeCombo.SelectedItem as ComboBoxItem)?.Content as string) ?? "高速贴片机";
                 string fullDeviceNumber = $"{deviceType}-{DeviceNumberText.Text}";
+                
+                // 项目号格式：项目号#设备号
+                string projectNumberWithDevice = $"{ProjectNumberText.Text.Trim()}#{DeviceNumberText.Text.Trim()}";
 
                 var record = new LicenseRecord
                 {
                     RecordTime = recordTime,
                     Department = ((DepartmentCombo.SelectedItem as ComboBoxItem)?.Content as string) ?? "技术部",
                     Operator = ((OperatorCombo.SelectedItem as ComboBoxItem)?.Content as string) ?? "彭耀东",
-                    ProjectNumber = ProjectNumberText.Text.Trim(),
+                    Applicant = ApplicantText.Text.Trim(),
+                    ProjectNumber = projectNumberWithDevice,
                     DeviceNumber = fullDeviceNumber,
+                    DeviceType = deviceType,
                     MachineCode = machineCodeContent
                 };
 
@@ -321,6 +327,127 @@ namespace LicenseManager.WPF
         }
 
         private void LicenseRecordGrid_SelectionChanged(object sender, SelectionChangedEventArgs e) { }
+
+        private long _editingRecordId = -1;
+
+        private void LicenseRecordGrid_BeginningEdit(object sender, DataGridBeginningEditEventArgs e)
+        {
+            // 检查当前行是否允许编辑
+            if (e.Row.Item is LicenseRecordViewModel viewModel)
+            {
+                if (!viewModel.IsEditing)
+                {
+                    e.Cancel = true; // 取消编辑
+                }
+            }
+            else
+            {
+                e.Cancel = true;
+            }
+        }
+
+        private void EditRecordBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_repository == null) return;
+
+            if (sender is Button btn && btn.Tag is long id)
+            {
+                // 如果正在编辑其他行，提示先保存
+                if (_editingRecordId != -1 && _editingRecordId != id)
+                {
+                    MessageBox.Show("请先保存当前编辑的记录", "提示", MessageBoxButton.OK, MessageBoxImage.Information);
+                    return;
+                }
+
+                // 如果点击的是当前正在编辑的行，不做任何操作
+                if (_editingRecordId == id)
+                {
+                    return;
+                }
+
+                _editingRecordId = id;
+                
+                // 启用DataGrid编辑
+                LicenseRecordGrid.IsReadOnly = false;
+                
+                // 标记所有行：当前行为可编辑，其他行为只读
+                foreach (var item in _recordList)
+                {
+                    item.IsEditing = (item.Id == id);
+                }
+                
+                // 选中当前行
+                var viewModel = _recordList.FirstOrDefault(r => r.Id == id);
+                if (viewModel != null)
+                {
+                    LicenseRecordGrid.SelectedItem = viewModel;
+                }
+                
+                LicenseRecordGrid.Items.Refresh();
+                LogMessage($"开始编辑记录，ID: {id}，请双击单元格进行编辑");
+            }
+        }
+
+        private void SaveEditBtn_Click(object sender, RoutedEventArgs e)
+        {
+            if (_repository == null) return;
+
+            if (sender is Button btn && btn.Tag is long id)
+            {
+                try
+                {
+                    // 结束编辑，确保数据更新到ViewModel
+                    LicenseRecordGrid.CommitEdit();
+                    
+                    // 禁用DataGrid编辑
+                    LicenseRecordGrid.IsReadOnly = true;
+
+                    // 获取编辑后的数据
+                    var viewModel = _recordList.FirstOrDefault(r => r.Id == id);
+                    if (viewModel != null)
+                    {
+                        // 从数据库获取原始记录
+                        var record = _repository.GetById(id);
+                        if (record != null)
+                        {
+                            // 更新记录数据
+                            record.RecordTime = viewModel.RecordTime;
+                            record.Department = viewModel.Department;
+                            record.Operator = viewModel.Operator;
+                            record.Applicant = viewModel.Applicant;
+                            record.ProjectNumber = viewModel.ProjectNumber;
+                            record.DeviceNumber = viewModel.DeviceNumber;
+                            record.DeviceType = viewModel.DeviceType;
+
+                            _repository.Update(record);
+                            LogMessage($"记录已更新，ID: {id}");
+                            MessageBox.Show("记录保存成功！", "成功", MessageBoxButton.OK, MessageBoxImage.Information);
+                        }
+                        viewModel.IsEditing = false;
+                    }
+                }
+                catch (Exception ex)
+                {
+                    LogMessage($"保存编辑失败: {ex.Message}");
+                    MessageBox.Show($"保存失败: {ex.Message}", "错误", MessageBoxButton.OK, MessageBoxImage.Error);
+                }
+                finally
+                {
+                    // 无论成功失败，都重置编辑状态
+                    _editingRecordId = -1;
+                    
+                    // 禁用DataGrid编辑，重置所有行的IsEditing状态
+                    LicenseRecordGrid.IsReadOnly = true;
+                    foreach (var item in _recordList)
+                    {
+                        item.IsEditing = false;
+                    }
+                    LicenseRecordGrid.Items.Refresh();
+                }
+            }
+        }
+
+
 
         private void ExportRecordBtn_Click(object sender, RoutedEventArgs e)
         {
@@ -525,8 +652,10 @@ namespace LicenseManager.WPF
                     RecordTime = r.RecordTime,
                     Department = r.Department,
                     Operator = r.Operator,
+                    Applicant = r.Applicant,
                     ProjectNumber = r.ProjectNumber,
                     DeviceNumber = r.DeviceNumber,
+                    DeviceType = r.DeviceType,
                     MachineCodeShort = TruncateString(r.MachineCode, 20),
                     FullRecord = r
                 };
@@ -550,6 +679,7 @@ namespace LicenseManager.WPF
             DeviceTypeCombo.SelectedIndex = 0;
             ProjectNumberText.Clear();
             DeviceNumberText.Clear();
+            ApplicantText.Clear();
             MachineCodeText.Clear();
         }
 
@@ -569,15 +699,99 @@ namespace LicenseManager.WPF
         #endregion
     }
 
-    public class LicenseRecordViewModel
+    public class LicenseRecordViewModel : System.ComponentModel.INotifyPropertyChanged
     {
         public long Id { get; set; }
-        public DateTime RecordTime { get; set; }
-        public string Department { get; set; }
-        public string Operator { get; set; }
-        public string ProjectNumber { get; set; }
-        public string DeviceNumber { get; set; }
+        
+        private DateTime _recordTime;
+        public DateTime RecordTime 
+        { 
+            get => _recordTime; 
+            set { _recordTime = value; OnPropertyChanged(nameof(RecordTime)); }
+        }
+        
+        private string _department;
+        public string Department 
+        { 
+            get => _department; 
+            set { _department = value; OnPropertyChanged(nameof(Department)); }
+        }
+        
+        private string _operator;
+        public string Operator 
+        { 
+            get => _operator; 
+            set { _operator = value; OnPropertyChanged(nameof(Operator)); }
+        }
+        
+        private string _applicant;
+        public string Applicant 
+        { 
+            get => _applicant; 
+            set { _applicant = value; OnPropertyChanged(nameof(Applicant)); }
+        }
+        
+        private string _projectNumber;
+        public string ProjectNumber 
+        { 
+            get => _projectNumber; 
+            set { _projectNumber = value; OnPropertyChanged(nameof(ProjectNumber)); }
+        }
+        
+        private string _deviceNumber;
+        public string DeviceNumber 
+        { 
+            get => _deviceNumber; 
+            set { _deviceNumber = value; OnPropertyChanged(nameof(DeviceNumber)); }
+        }
+
+        private string _deviceType;
+        public string DeviceType 
+        { 
+            get => _deviceType; 
+            set { _deviceType = value; OnPropertyChanged(nameof(DeviceType)); }
+        }
+        
         public string MachineCodeShort { get; set; }
         public LicenseRecord FullRecord { get; set; }
+        
+        private bool _isEditing;
+        public bool IsEditing 
+        { 
+            get => _isEditing; 
+            set { _isEditing = value; OnPropertyChanged(nameof(IsEditing)); }
+        }
+
+        public event System.ComponentModel.PropertyChangedEventHandler PropertyChanged;
+        protected void OnPropertyChanged(string propertyName)
+        {
+            PropertyChanged?.Invoke(this, new System.ComponentModel.PropertyChangedEventArgs(propertyName));
+        }
+    }
+
+    public class BoolToVisibilityConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is bool b && b ? System.Windows.Visibility.Visible : System.Windows.Visibility.Collapsed;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is System.Windows.Visibility v && v == System.Windows.Visibility.Visible;
+        }
+    }
+
+    public class InverseBoolToVisibilityConverter : System.Windows.Data.IValueConverter
+    {
+        public object Convert(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is bool b && b ? System.Windows.Visibility.Collapsed : System.Windows.Visibility.Visible;
+        }
+
+        public object ConvertBack(object value, Type targetType, object parameter, System.Globalization.CultureInfo culture)
+        {
+            return value is System.Windows.Visibility v && v != System.Windows.Visibility.Visible;
+        }
     }
 }

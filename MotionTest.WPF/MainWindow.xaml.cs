@@ -10,6 +10,8 @@ using System.Windows.Threading;
 using CoreToolkit.Data;
 using CoreToolkit.Motion.Core;
 using CoreToolkit.Motion.Factory;
+using MotionTest.WPF.ViewModels;
+using MotionTest.WPF.Views;
 
 namespace MotionTest.WPF
 {
@@ -642,6 +644,72 @@ namespace MotionTest.WPF
             catch (Exception ex)
             {
                 LogMessage($"打开流程控制窗口失败: {ex.Message}");
+            }
+        }
+
+        /// <summary>
+        /// 打开安全监控窗口（MVVM + 安全事件持久化）
+        /// </summary>
+        private void SafetyMonitorBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                if (_motionCard == null || !_isCardOpen)
+                {
+                    MessageBox.Show("请先初始化并打开控制卡", "提示", 
+                        MessageBoxButton.OK, MessageBoxImage.Warning);
+                    return;
+                }
+
+                // 传入 LogRepository，使安全事件（碰撞/互锁/急停）自动持久化到数据库
+                var safetyWindow = new SafetyMonitorWindow(_motionCard, _logRepo);
+                safetyWindow.Show();
+                LogMessage("打开安全防护监控窗口 (MVVM)");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"打开安全监控窗口失败: {ex.Message}");
+                MessageBox.Show($"打开失败: {ex.Message}", "错误", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// 打开安全事件历史查询窗口
+        /// </summary>
+        private void SafetyHistoryBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var historyWindow = new SafetyEventHistoryWindow(_logRepo);
+                historyWindow.Show();
+                LogMessage("打开安全事件历史查询窗口");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"打开历史查询窗口失败: {ex.Message}");
+                MessageBox.Show($"打开失败: {ex.Message}", "错误", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
+            }
+        }
+
+        /// <summary>
+        /// 打开安全统计报表窗口
+        /// </summary>
+        private void SafetyReportBtn_Click(object sender, RoutedEventArgs e)
+        {
+            try
+            {
+                var viewModel = new SafetyStatisticsViewModel(_logRepo);
+                var reportWindow = new SafetyStatisticsWindow(viewModel);
+                reportWindow.Show();
+                LogMessage("打开安全统计报表窗口");
+            }
+            catch (Exception ex)
+            {
+                LogMessage($"打开报表窗口失败: {ex.Message}");
+                MessageBox.Show($"打开失败: {ex.Message}", "错误", 
+                    MessageBoxButton.OK, MessageBoxImage.Error);
             }
         }
 

@@ -156,12 +156,29 @@ SqlDemo/
 │   │   │   └── TrajectoryRecorder.cs    # 轨迹记录
 │   │   └── Models/
 │   │       ├── StateMachineModels.cs     # 状态机模型
-│   └── Algorithm/                       # 算法层
+│   ├── Algorithm/                       # 算法层
+│   │   ├── Helpers/
+│   │   │   ├── GeometryHelper.cs        # 几何计算（旋转、交点、圆心）
+│   │   │   └── CompensationHelper.cs    # 补偿算法（线性/双线性插值）
+│   │   └── Models/
+│   │       └── Point2D.cs               # 二维点
+│   └── Safety/                          # 安全与防撞击层
+│       ├── Core/
+│       │   └── ICollisionDetector.cs    # 碰撞检测接口
 │       ├── Helpers/
-│       │   ├── GeometryHelper.cs        # 几何计算（旋转、交点、圆心）
-│       │   └── CompensationHelper.cs    # 补偿算法（线性/双线性插值）
+│       │   ├── CollisionDetector.cs     # AABB碰撞检测引擎
+│       │   ├── SoftLimitGuard.cs        # 软限位守卫
+│       │   ├── InterlockEngine.cs       # 互锁规则引擎
+│       │   ├── SafeMotionController.cs  # 安全运动控制器（包装IMotionCard）
+│       │   ├── SafetyMonitor.cs         # 后台安全监控器
+│       │   ├── DualHeadAntiCollision.cs # 双头防碰撞
+│       │   ├── SafetyConfigLoader.cs    # 安全配置JSON加载
+│       │   └── SafetySetupHelper.cs     # 一键初始化助手
+│       ├── Modules/
+│       │   ├── SafetyCheckModule.cs     # 状态机安全检查模块
+│       │   └── SafeAxisMoveModule.cs    # 带安全防护的轴运动模块
 │       └── Models/
-│           └── Point2D.cs               # 二维点
+│           ├── SafetyModels.cs          # 安全体积、包围盒、碰撞结果等模型
 │
 ├── CoreToolkit.Desktop/                # WPF MVVM 辅助类库
 │   ├── CoreToolkit.Desktop.csproj
@@ -412,6 +429,52 @@ dotnet run --project MotionTest.WPF
 - **统计功能**：成功率、执行时间、错误信息等
 - **并行优化**：支持多模块并行执行，提升效率
 - **资源安全**：完整的 IDisposable 实现，避免资源泄漏
+
+#### 10. 安全与防撞击层 `CoreToolkit.Safety`
+
+工业设备最核心的安全机制，采用**五层防护模型**：
+
+| 层级 | 组件 | 说明 |
+|------|------|------|
+| Layer 5 | `SafeMotionController.PreMoveCheck` | 运动前碰撞预测（静态预判） |
+| Layer 4 | `InterlockEngine` | 区域互锁/禁区（安全门、真空、Z轴深度等） |
+| Layer 3 | `SoftLimitGuard` | 软限位（软件行程边界） |
+| Layer 2 | 硬限位/伺服报警 | 已有 `IMotionCard` 层面保护 |
+| Layer 1 | `SafetyMonitor` | 后台实时监控（100ms周期动态检测） |
+
+**碰撞检测引擎 `CollisionDetector`**
+- 基于 **AABB 轴对齐包围盒** 的碰撞检测
+- 支持三种体积类型：`Dynamic`（运动部件）、`Static`（静止障碍）、`Temporary`（临时禁区）
+- 支持**碰撞预览**：假设运动到目标位置后检测是否会碰撞
+- 支持安全余量（Margin）自动扩展包围盒
+
+**软限位守卫 `SoftLimitGuard`**
+- 按轴配置正负向软件行程限制
+- 批量检查多轴目标位置是否在安全范围内
+
+**互锁规则引擎 `InterlockEngine`**
+- 条件-动作规则系统：当条件满足时执行指定动作
+- 动作类型：`BlockMotion`（禁止运动）、`EmergencyStop`（急停）、`DecelerateStop`（减速停）、`AlarmOnly`（仅报警）
+- 规则优先级自动排序：`EmergencyStop` > `DecelerateStop` > `BlockMotion` > `AlarmOnly`
+
+**安全运动控制器 `SafeMotionController`**
+- 包装 `IMotionCard`，所有运动指令自动进行 **互锁 → 软限位 → 碰撞预测** 三层检查
+- 提供 `MoveAbsoluteSafe`、`MoveRelativeSafe`、`LinearInterpolationSafe`、`JogSafe` 等方法
+- 检查失败时触发 `SafetyViolation` 事件并返回具体阻止原因
+
+**双头防碰撞 `DualHeadAntiCollision`**
+- 针对贴片机/固晶机**双贴装头同横梁**场景
+- 支持最小安全间距控制、禁止交叉过头
+- 提供同步双头安全移动、安全范围查询
+
+**后台安全监控 `SafetyMonitor`**
+- 独立后台线程，默认 **100ms** 周期实时检测
+- 自动更新动态体积位置、检测碰撞、评估互锁
+- 异常时根据策略自动执行急停/减速停/报警
+
+**状态机集成**
+- `SafetyCheckModule`：可嵌入流程任意节点作为安全检查
+- `SafeAxisMoveModule`：自带安全防护的轴运动模块，运动前自动执行 `PreMoveCheck`
 
 ### 二、CoreToolkit.Desktop（WPF MVVM 辅助库）
 
@@ -776,6 +839,120 @@ public class MyViewModel : ObservableObject
 <Button Content="保存" Command="{Binding SaveCommand}"/>
 ```
 
+### 安全防护与防撞击
+
+```csharp
+using CoreToolkit.Safety.Helpers;
+using CoreToolkit.Safety.Models;
+using CoreToolkit.Safety.Modules;
+
+// ==================== 1. 快速搭建完整安全系统 ====================
+var motionCard = MotionCardFactory.CreateCard("PCI1285");
+motionCard.Initialize(new MotionConfig { CardId = 0 });
+motionCard.Open();
+
+// 一键创建（含默认配置）
+var safe = SafetySetupHelper.CreateSafeMotionSystem(motionCard);
+
+// 或手动精细配置
+var detector = new CollisionDetector();
+var softLimit = new SoftLimitGuard();
+var interlock = new InterlockEngine();
+
+// 软限位
+softLimit.SetLimit(0, positiveLimit: 600, negativeLimit: 0);  // X轴
+softLimit.SetLimit(1, positiveLimit: 500, negativeLimit: 0);  // Y轴
+softLimit.SetLimit(2, positiveLimit: 50,  negativeLimit: 0);  // Z轴
+
+// 注册动态体积：贴装头
+detector.RegisterVolume(new SafetyVolume
+{
+    Name = "贴装头",
+    Type = VolumeType.Dynamic,
+    BoundingBox = new BoundingBox
+    {
+        MinX = -10, MaxX = 10,
+        MinY = -10, MaxY = 10,
+        MinZ = -30, MaxZ = 5
+    },
+    SafetyMargin = 2.0,
+    LinkedAxes = new[] { 0, 1, 2 },
+    OffsetX = 0, OffsetY = 0, OffsetZ = 0
+});
+
+// 注册静态障碍：基板治具
+detector.RegisterVolume(new SafetyVolume
+{
+    Name = "基板治具",
+    Type = VolumeType.Static,
+    BoundingBox = new BoundingBox
+    {
+        MinX = 100, MaxX = 500,
+        MinY = 50,  MaxY = 450,
+        MinZ = -5,  MaxZ = 10
+    },
+    SafetyMargin = 5.0
+});
+
+// 互锁规则
+SafetySetupHelper.AddSafetyDoorInterlock(interlock, () => motionCard.ReadInput(10));
+SafetySetupHelper.AddZAxisDepthProtection(interlock, () => motionCard.GetPosition(2), maxDepth: 45);
+SafetySetupHelper.AddServoEnableCheck(interlock, () => motionCard.GetServoEnable(0));
+
+safe = new SafeMotionController(motionCard, detector, softLimit, interlock);
+
+// ==================== 2. 安全运动（自动三层检查） ====================
+var result = safe.MoveAbsoluteSafe(axis: 0, position: 300, speed: 5000);
+if (result.IsFailure)
+{
+    Console.WriteLine($"运动被阻止：{result.Message}");
+}
+
+var moveResult = safe.LinearInterpolationSafe(
+    new[] { 0, 1, 2 },
+    new[] { 300.0, 200.0, 10.0 },
+    speed: 5000);
+
+// ==================== 3. 启动后台实时监控 ====================
+var monitor = SafetySetupHelper.CreateAndStartMonitor(
+    motionCard, safe.CollisionDetector, safe.InterlockEngine);
+
+monitor.RegisterVolumeAxisMapping("贴装头", 0, 1, 2);
+monitor.CollisionDetected += (s, e) => Console.WriteLine($"🚨 碰撞：{e.Message}");
+monitor.InterlockTriggered += (s, e) => Console.WriteLine($"⚠️ 互锁：{e.BlockReason}");
+
+// ==================== 4. 双头防碰撞 ====================
+var dualHead = SafetySetupHelper.SetupDualHeadProtection(
+    motionCard, headAAxis: 0, headBAxis: 1,
+    minSeparation: 50.0, preventCrossing: true);
+
+dualHead.MoveHeadASafe(targetPosition: 100, speed: 5000);
+var (min, max) = dualHead.GetSafeRangeForHeadA();
+
+// ==================== 5. 状态机集成 ====================
+var root = new SequentialModule("贴装流程");
+
+// 安全检查节点
+root.AddModule(new SafetyCheckModule(
+    safe.CollisionDetector, safe.InterlockEngine, name: "运动前安全检查"));
+
+// 带安全防护的轴运动
+root.AddModule(new SafeAxisMoveModule(safe, "移动到取料位")
+{
+    AxisIndices = new[] { 0, 1, 2 },
+    TargetPositions = new[] { 100.0, 200.0, 15.0 },
+    Velocities = new[] { 5000.0, 5000.0, 3000.0 },
+    IsAbsolute = true
+});
+
+// ==================== 6. 配置文件管理 ====================
+var config = SafetyConfigLoader.CreateSmtDefaultConfig();
+SafetyConfigLoader.SaveToFile(config, @"Config\safety.json");
+
+var loadedConfig = SafetyConfigLoader.LoadFromFile(@"Config\safety.json");
+var safeFromConfig = SafetySetupHelper.CreateSafeMotionSystem(motionCard, loadedConfig);
+```
+
 ***
 
 ## 扩展指南
@@ -794,7 +971,8 @@ CoreToolkit/
 ├── Equipment/      # 设备通用组件（吸嘴、供料器、加热等）
 ├── MES/            # MES 系统对接
 ├── Files/          # 文件管理（配方、CSV、INI）
-└── Algorithm/      # 算法工具
+├── Algorithm/      # 算法工具
+└── Safety/         # 安全与防撞击
 ```
 
 命名空间统一使用 `CoreToolkit.XXX`，例如：
@@ -804,6 +982,7 @@ CoreToolkit/
 - `CoreToolkit.Equipment`
 - `CoreToolkit.MES`
 - `CoreToolkit.Files`
+- `CoreToolkit.Safety`
 
 ### 新增数据表
 
@@ -986,6 +1165,50 @@ searcher.CleanupOldFiles("TUM126316D020", keepCount: 5);
 2. 在 `Converters/` 下添加新的值转换器
 3. 在 `Behaviors/` 下添加新的附加行为
 
+### 扩展安全防护（Safety）
+
+**新增安全体积**
+1. 在 `CoreToolkit/Safety/Models` 下定义新的体积类型（如旋转体用 `BoundingSphere`）
+2. 在 `CollisionDetector` 中扩展检测算法（如改用 OBB、GJK、空间哈希）
+3. 在 `SafetySetupHelper` 中添加快速初始化方法
+
+**新增互锁规则**
+1. 使用 `InterlockEngine.AddRule()` 动态添加
+2. 规则条件使用 `Func<bool>` 委托，可读取任意 IO/轴状态/传感器数据
+3. 规则动作选择：`BlockMotion` / `EmergencyStop` / `DecelerateStop` / `AlarmOnly`
+
+**自定义安全运动**
+```csharp
+public class CustomSafeMotionController : SafeMotionController
+{
+    public CustomSafeMotionController(IMotionCard card) : base(card) { }
+
+    // 重写预检查逻辑，添加自定义层
+    public override MoveSafetyResult PreMoveCheck(int axis, double target)
+    {
+        // 先执行默认三层检查
+        var baseResult = base.PreMoveCheck(axis, target);
+        if (!baseResult.IsAllowed) return baseResult;
+
+        // 再添加自定义检查（如振动传感器阈值）
+        if (_vibrationSensor.Value > 5.0)
+            return MoveSafetyResult.Blocked("振动过大，禁止运动");
+
+        return MoveSafetyResult.Allowed();
+    }
+}
+```
+
+**新增状态机安全模块**
+1. 继承 `FlowModuleBase` 或 `SafetyCheckModule`
+2. 在 `ExecuteInternalAsync` 中调用 `CollisionDetector.CheckCollision()`
+3. 将模块插入流程关键节点（取料前、贴装前、换轨前）
+
+**性能优化建议**
+- 体积数量 < 20：直接使用现有 `O(N^2)` 两两检测
+- 体积数量 > 50：建议改用**八叉树**或**均匀网格**空间分割，将复杂度降为 `O(N log N)`
+- 碰撞检测周期：自动运行模式建议 ≤ 100ms；手动/JOG 模式建议 ≤ 50ms
+
 ***
 
 ## 注意事项
@@ -995,6 +1218,12 @@ searcher.CleanupOldFiles("TUM126316D020", keepCount: 5);
 3. **WPF 权限**：使用研华控制卡时，程序需要以管理员权限运行，且 `AdvMotAPI.dll` 必须在输出目录中。
 4. **异步操作**：异步 API 使用 `async/await` 模式，调用方需标记 `async`。
 5. **自动迁移**：`AutoAddMissingColumns` 仅支持在表末尾添加列，无法指定列位置。
+6. **安全防护**：
+   - `SafeMotionController` 的 `SafetyEnabled` 属性仅在调试时可临时关闭，**正式发布时严禁禁用**
+   - `SafetyMonitor` 后台监控应始终运行，停止监控后设备安全等级下降
+   - 碰撞检测基于 AABB 包围盒，对于旋转体或非轴对齐物体可能产生漏检，需额外增加安全余量补偿
+   - 双头防碰撞的 `PreventCrossing` 建议始终开启，除非有特殊工艺需求并经过风险评估
+   - 所有互锁规则的条件委托中**禁止阻塞**，否则会导致监控线程卡顿
 
 ***
 

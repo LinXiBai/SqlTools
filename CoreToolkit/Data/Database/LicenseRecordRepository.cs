@@ -85,6 +85,24 @@ namespace CoreToolkit.Data
         }
 
         /// <summary>
+        /// 按申请人查询授权记录
+        /// </summary>
+        public IEnumerable<LicenseRecord> GetByApplicant(string applicant)
+        {
+            string whereClause = "Applicant = @Applicant";
+            return Query(whereClause, new { Applicant = applicant });
+        }
+
+        /// <summary>
+        /// 异步按申请人查询授权记录
+        /// </summary>
+        public async Task<IEnumerable<LicenseRecord>> GetByApplicantAsync(string applicant)
+        {
+            string whereClause = "Applicant = @Applicant";
+            return await QueryAsync(whereClause, new { Applicant = applicant });
+        }
+
+        /// <summary>
         /// 按机器码查询授权记录
         /// </summary>
         public LicenseRecord GetByMachineCode(string machineCode)
@@ -154,7 +172,7 @@ namespace CoreToolkit.Data
         /// 组合条件查询授权记录
         /// </summary>
         public IEnumerable<LicenseRecord> SearchRecords(string projectNumber = null, string deviceNumber = null, 
-            string department = null, string operatorName = null, DateTime? startDate = null, DateTime? endDate = null)
+            string department = null, string operatorName = null, string applicant = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             var conditions = new List<string>();
             var parameters = new DynamicParameters();
@@ -181,6 +199,12 @@ namespace CoreToolkit.Data
             {
                 conditions.Add("Operator = @Operator");
                 parameters.Add("Operator", operatorName);
+            }
+
+            if (!string.IsNullOrEmpty(applicant))
+            {
+                conditions.Add("Applicant = @Applicant");
+                parameters.Add("Applicant", applicant);
             }
 
             if (startDate.HasValue)
@@ -212,7 +236,7 @@ namespace CoreToolkit.Data
         /// 异步组合条件查询授权记录
         /// </summary>
         public async Task<IEnumerable<LicenseRecord>> SearchRecordsAsync(string projectNumber = null, string deviceNumber = null,
-            string department = null, string operatorName = null, DateTime? startDate = null, DateTime? endDate = null)
+            string department = null, string operatorName = null, string applicant = null, DateTime? startDate = null, DateTime? endDate = null)
         {
             var conditions = new List<string>();
             var parameters = new DynamicParameters();
@@ -239,6 +263,12 @@ namespace CoreToolkit.Data
             {
                 conditions.Add("Operator = @Operator");
                 parameters.Add("Operator", operatorName);
+            }
+
+            if (!string.IsNullOrEmpty(applicant))
+            {
+                conditions.Add("Applicant = @Applicant");
+                parameters.Add("Applicant", applicant);
             }
 
             if (startDate.HasValue)
@@ -323,6 +353,7 @@ namespace CoreToolkit.Data
                     COUNT(DISTINCT DeviceNumber) as DeviceCount,
                     COUNT(DISTINCT Department) as DepartmentCount,
                     COUNT(DISTINCT Operator) as OperatorCount,
+                    COUNT(DISTINCT Applicant) as ApplicantCount,
                     MAX(RecordTime) as LastRecordTime,
                     MIN(RecordTime) as FirstRecordTime
                 FROM {TableName}";
@@ -342,6 +373,7 @@ namespace CoreToolkit.Data
                     COUNT(DISTINCT DeviceNumber) as DeviceCount,
                     COUNT(DISTINCT Department) as DepartmentCount,
                     COUNT(DISTINCT Operator) as OperatorCount,
+                    COUNT(DISTINCT Applicant) as ApplicantCount,
                     MAX(RecordTime) as LastRecordTime,
                     MIN(RecordTime) as FirstRecordTime
                 FROM {TableName}";
@@ -383,6 +415,11 @@ namespace CoreToolkit.Data
         /// 记录人数量
         /// </summary>
         public long OperatorCount { get; set; }
+
+        /// <summary>
+        /// 申请人数量
+        /// </summary>
+        public long ApplicantCount { get; set; }
 
         /// <summary>
         /// 最后记录时间

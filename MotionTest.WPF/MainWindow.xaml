@@ -148,6 +148,20 @@
                                        HorizontalAlignment="Center" Margin="0,2"/>
                         </StackPanel>
                     </GroupBox>
+                    
+                    <!-- 安全防护 -->
+                    <GroupBox Grid.Row="5" Header="安全防护监控" Margin="5">
+                        <StackPanel Margin="5">
+                            <Button x:Name="SafetyMonitorBtn" Content="🔒 打开安全监控窗口" Margin="0,2" 
+                                    Click="SafetyMonitorBtn_Click" Background="#FF2196F3" Foreground="White"/>
+                            <Button x:Name="SafetyHistoryBtn" Content="📋 安全事件历史" Margin="0,2" 
+                                    Click="SafetyHistoryBtn_Click" Background="#FF9C27B0" Foreground="White"/>
+                            <Button x:Name="SafetyReportBtn" Content="📊 安全统计报表" Margin="0,2" 
+                                    Click="SafetyReportBtn_Click" Background="#FF795548" Foreground="White"/>
+                            <TextBlock Text="监控/历史/报表" FontSize="10" Foreground="Gray" 
+                                       HorizontalAlignment="Center" Margin="0,2"/>
+                        </StackPanel>
+                    </GroupBox>
                 </Grid>
             </Border>
             

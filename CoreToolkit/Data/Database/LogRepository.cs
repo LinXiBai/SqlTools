@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.Diagnostics;
 using System.Threading;
 using System.Threading.Tasks;
+using CoreToolkit.Data.Models;
 using Dapper;
 
 namespace CoreToolkit.Data
@@ -299,5 +300,101 @@ namespace CoreToolkit.Data
             string sql = $"DELETE FROM {TableName} WHERE Level = @Level";
             return await _db.ExecuteAsync(sql, new { Level = level });
         }
+
+        #region 安全事件统计报表
+
+        /// <summary>
+        /// 获取安全事件按级别分组统计
+        /// </summary>
+        public IEnumerable<SafetyEventStatistic> GetSafetyEventStatistics(DateTime startDate, DateTime endDate, string loggerName = "SafetyMonitor")
+        {
+            string sql = $@"SELECT Level, COUNT(*) as Count 
+                            FROM {TableName} 
+                            WHERE Timestamp BETWEEN @StartDate AND @EndDate 
+                            AND (@LoggerName IS NULL OR LoggerName = @LoggerName)
+                            GROUP BY Level";
+            return _db.Query<SafetyEventStatistic>(sql, new { StartDate = startDate, EndDate = endDate, LoggerName = loggerName });
+        }
+
+        /// <summary>
+        /// 按天统计安全事件（已聚合碰撞/互锁/急停/信息）
+        /// </summary>
+        public IEnumerable<SafetyEventDailyStat> GetSafetyEventDailyStats(DateTime startDate, DateTime endDate, string loggerName = "SafetyMonitor")
+        {
+            string sql = $@"SELECT 
+                                date(Timestamp) as Date,
+                                SUM(CASE WHEN Level = 'Error' THEN 1 ELSE 0 END) as CollisionCount,
+                                SUM(CASE WHEN Level = 'Warning' THEN 1 ELSE 0 END) as InterlockCount,
+                                SUM(CASE WHEN Level = 'Fatal' THEN 1 ELSE 0 END) as EStopCount,
+                                SUM(CASE WHEN Level = 'Info' THEN 1 ELSE 0 END) as InfoCount
+                            FROM {TableName}
+                            WHERE Timestamp BETWEEN @StartDate AND @EndDate
+                            AND (@LoggerName IS NULL OR LoggerName = @LoggerName)
+                            GROUP BY date(Timestamp)
+                            ORDER BY date(Timestamp)";
+            return _db.Query<SafetyEventDailyStat>(sql, new { StartDate = startDate, EndDate = endDate, LoggerName = loggerName });
+        }
+
+        /// <summary>
+        /// 按周统计安全事件
+        /// </summary>
+        public IEnumerable<SafetyEventPeriodStat> GetSafetyEventWeeklyStats(DateTime startDate, DateTime endDate, string loggerName = "SafetyMonitor")
+        {
+            string sql = $@"SELECT 
+                                strftime('%Y-W%W', Timestamp) as Period,
+                                date(Timestamp, 'weekday 0', '-7 days') as PeriodStart,
+                                date(Timestamp, 'weekday 0', '-1 days') as PeriodEnd,
+                                SUM(CASE WHEN Level = 'Error' THEN 1 ELSE 0 END) as CollisionCount,
+                                SUM(CASE WHEN Level = 'Warning' THEN 1 ELSE 0 END) as InterlockCount,
+                                SUM(CASE WHEN Level = 'Fatal' THEN 1 ELSE 0 END) as EStopCount,
+                                SUM(CASE WHEN Level = 'Info' THEN 1 ELSE 0 END) as InfoCount
+                            FROM {TableName}
+                            WHERE Timestamp BETWEEN @StartDate AND @EndDate
+                            AND (@LoggerName IS NULL OR LoggerName = @LoggerName)
+                            GROUP BY strftime('%Y-W%W', Timestamp)
+                            ORDER BY Period";
+            return _db.Query<SafetyEventPeriodStat>(sql, new { StartDate = startDate, EndDate = endDate, LoggerName = loggerName });
+        }
+
+        /// <summary>
+        /// 按月统计安全事件
+        /// </summary>
+        public IEnumerable<SafetyEventPeriodStat> GetSafetyEventMonthlyStats(DateTime startDate, DateTime endDate, string loggerName = "SafetyMonitor")
+        {
+            string sql = $@"SELECT 
+                                strftime('%Y-%m', Timestamp) as Period,
+                                date(Timestamp, 'start of month') as PeriodStart,
+                                date(Timestamp, 'start of month', '+1 month', '-1 day') as PeriodEnd,
+                                SUM(CASE WHEN Level = 'Error' THEN 1 ELSE 0 END) as CollisionCount,
+                                SUM(CASE WHEN Level = 'Warning' THEN 1 ELSE 0 END) as InterlockCount,
+                                SUM(CASE WHEN Level = 'Fatal' THEN 1 ELSE 0 END) as EStopCount,
+                                SUM(CASE WHEN Level = 'Info' THEN 1 ELSE 0 END) as InfoCount
+                            FROM {TableName}
+                            WHERE Timestamp BETWEEN @StartDate AND @EndDate
+                            AND (@LoggerName IS NULL OR LoggerName = @LoggerName)
+                            GROUP BY strftime('%Y-%m', Timestamp)
+                            ORDER BY Period";
+            return _db.Query<SafetyEventPeriodStat>(sql, new { StartDate = startDate, EndDate = endDate, LoggerName = loggerName });
+        }
+
+        /// <summary>
+        /// 获取安全事件摘要（总数 + 各级别数）
+        /// </summary>
+        public SafetyEventSummary GetSafetyEventSummary(DateTime startDate, DateTime endDate, string loggerName = "SafetyMonitor")
+        {
+            string sql = $@"SELECT 
+                                COUNT(*) as TotalCount,
+                                SUM(CASE WHEN Level = 'Fatal' THEN 1 ELSE 0 END) as FatalCount,
+                                SUM(CASE WHEN Level = 'Error' THEN 1 ELSE 0 END) as ErrorCount,
+                                SUM(CASE WHEN Level = 'Warning' THEN 1 ELSE 0 END) as WarningCount,
+                                SUM(CASE WHEN Level = 'Info' THEN 1 ELSE 0 END) as InfoCount
+                            FROM {TableName}
+                            WHERE Timestamp BETWEEN @StartDate AND @EndDate
+                            AND (@LoggerName IS NULL OR LoggerName = @LoggerName)";
+            return _db.QuerySingleOrDefault<SafetyEventSummary>(sql, new { StartDate = startDate, EndDate = endDate, LoggerName = loggerName })
+                ?? new SafetyEventSummary();
+        }
+
+        #endregion
     }
 }

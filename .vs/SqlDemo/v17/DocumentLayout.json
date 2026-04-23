@@ -3,68 +3,72 @@
   "WorkspaceRootPath": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\",
   "Documents": [
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\axiscontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motiontest.wpf\\axiscontrol.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F12345678901}|LicenseManager.WPF\\LicenseManager.WPF.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\licensemanager.wpf\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{B2C3D4E5-F6A7-8901-BCDE-F12345678901}|LicenseManager.WPF\\LicenseManager.WPF.csproj|solutionrelative:licensemanager.wpf\\mainwindow.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motiontest.wpf\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\AxisControl.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionTest.WPF\\AxisControl.xaml.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\app.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motiontest.wpf\\app.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
+      "AbsoluteMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|solutionrelative:motiontest.wpf\\mainwindow.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motiontest.wpf\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
+      "AbsoluteMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\app.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|",
+      "RelativeMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|solutionrelative:motiontest.wpf\\app.xaml.cs||{8B382828-6202-11D1-8870-0000F87579D2}|"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\providers\\advantech\\pci1203.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\providers\\advantech\\pci1203.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motiontest.wpf\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}",
+      "RelativeMoniker": "D:0:0:{54147AD0-A7D8-449E-87BB-1E057973A872}|MotionTest.WPF\\MotionTest.WPF.csproj|solutionrelative:motiontest.wpf\\app.xaml||{F11ACC28-31D1-4C80-A34B-F4E09D3D753C}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\factory\\motioncardfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\factory\\motioncardfactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Providers\\Advantech\\PCI1203.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Providers\\Advantech\\PCI1203.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\core\\motionexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\core\\motionexception.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Factory\\MotionCardFactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Factory\\MotionCardFactory.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\core\\motionconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\core\\motionconfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\MotionException.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Core\\MotionException.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\core\\imotioncard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\core\\imotioncard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\MotionConfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Core\\MotionConfig.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\motionlib\\core\\axisstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:motionlib\\core\\axisstatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\IMotionCard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Core\\IMotionCard.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\entitybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\AxisStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:MotionLib\\Core\\AxisStatus.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\EntityBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Models\\EntityBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\models\\user.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\Attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Models\\Attributes.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\sqlitedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\sqlitedbcontext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Models\\User.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\repositorybase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\SqliteDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Data\\SqliteDbContext.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     },
     {
-      "AbsoluteMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|e:\\\u516C\u53F8\\\u9879\u76EE\\sqldemo\\sqldemo.data\\data\\logrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
-      "RelativeMoniker": "D:0:0:{4BE48FE9-0EC3-B1FD-AD31-996112096850}|SqlDemo.csproj|solutionrelative:sqldemo.data\\data\\logrepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\RepositoryBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Data\\RepositoryBase.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
+    },
+    {
+      "AbsoluteMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\LogRepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}",
+      "RelativeMoniker": "D:0:0:{A2FE74E1-B743-11D0-AE1A-00A0C90FFFC3}|\u003CMiscFiles\u003E|solutionrelative:SqlDemo.Data\\Data\\LogRepository.cs||{A6C744A8-0E4A-4FC6-886A-064283054674}"
     }
   ],
   "DocumentGroupContainers": [
@@ -74,12 +78,8 @@
       "DocumentGroups": [
         {
           "DockedWidth": 200,
-          "SelectedChildIndex": 3,
+          "SelectedChildIndex": 2,
           "Children": [
-            {
-              "$type": "Bookmark",
-              "Name": "ST:0:0:{1c4feeaa-4718-4aa9-859d-94ce25d182ba}"
-            },
             {
               "$type": "Bookmark",
               "Name": "ST:129:0:{1fc202d4-d401-403c-9834-5b218574bb67}"
@@ -91,19 +91,30 @@
             {
               "$type": "Document",
               "DocumentIndex": 0,
-              "Title": "AxisControl.xaml.cs",
-              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\AxisControl.xaml.cs",
-              "RelativeDocumentMoniker": "MotionTest.WPF\\AxisControl.xaml.cs",
-              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\AxisControl.xaml.cs",
-              "RelativeToolTip": "MotionTest.WPF\\AxisControl.xaml.cs",
-              "ViewState": "AQIAAAAAAAAAAAAAAAAAADEAAAAJAAAA",
+              "Title": "MainWindow.xaml.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\LicenseManager.WPF\\MainWindow.xaml.cs",
+              "RelativeDocumentMoniker": "LicenseManager.WPF\\MainWindow.xaml.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\LicenseManager.WPF\\MainWindow.xaml.cs",
+              "RelativeToolTip": "LicenseManager.WPF\\MainWindow.xaml.cs",
+              "ViewState": "AQIAAKIAAAAAAAAAAAAIwFUAAAAOAAAA",
               "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
-              "WhenOpened": "2026-04-03T04:49:18.106Z",
+              "WhenOpened": "2026-04-11T05:18:26.72Z",
               "EditorCaption": ""
             },
             {
               "$type": "Document",
               "DocumentIndex": 1,
+              "Title": "AxisControl.xaml.cs",
+              "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\AxisControl.xaml.cs",
+              "RelativeDocumentMoniker": "MotionTest.WPF\\AxisControl.xaml.cs",
+              "ToolTip": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\AxisControl.xaml.cs",
+              "RelativeToolTip": "MotionTest.WPF\\AxisControl.xaml.cs",
+              "Icon": "ae27a6b0-e345-4288-96df-5eaf394ee369.000738|",
+              "WhenOpened": "2026-04-03T04:49:18.106Z"
+            },
+            {
+              "$type": "Document",
+              "DocumentIndex": 2,
               "Title": "MainWindow.xaml",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\MainWindow.xaml",
               "RelativeDocumentMoniker": "MotionTest.WPF\\MainWindow.xaml",
@@ -114,7 +125,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 2,
+              "DocumentIndex": 3,
               "Title": "App.xaml.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\App.xaml.cs",
               "RelativeDocumentMoniker": "MotionTest.WPF\\App.xaml.cs",
@@ -126,7 +137,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 3,
+              "DocumentIndex": 4,
               "Title": "App.xaml",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionTest.WPF\\App.xaml",
               "RelativeDocumentMoniker": "MotionTest.WPF\\App.xaml",
@@ -137,7 +148,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 4,
+              "DocumentIndex": 5,
               "Title": "PCI1203.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Providers\\Advantech\\PCI1203.cs",
               "RelativeDocumentMoniker": "MotionLib\\Providers\\Advantech\\PCI1203.cs",
@@ -149,7 +160,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 5,
+              "DocumentIndex": 6,
               "Title": "MotionCardFactory.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Factory\\MotionCardFactory.cs",
               "RelativeDocumentMoniker": "MotionLib\\Factory\\MotionCardFactory.cs",
@@ -161,7 +172,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 6,
+              "DocumentIndex": 7,
               "Title": "MotionException.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\MotionException.cs",
               "RelativeDocumentMoniker": "MotionLib\\Core\\MotionException.cs",
@@ -173,7 +184,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 7,
+              "DocumentIndex": 8,
               "Title": "MotionConfig.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\MotionConfig.cs",
               "RelativeDocumentMoniker": "MotionLib\\Core\\MotionConfig.cs",
@@ -185,7 +196,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 8,
+              "DocumentIndex": 9,
               "Title": "IMotionCard.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\IMotionCard.cs",
               "RelativeDocumentMoniker": "MotionLib\\Core\\IMotionCard.cs",
@@ -197,7 +208,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 9,
+              "DocumentIndex": 10,
               "Title": "AxisStatus.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\MotionLib\\Core\\AxisStatus.cs",
               "RelativeDocumentMoniker": "MotionLib\\Core\\AxisStatus.cs",
@@ -209,7 +220,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 10,
+              "DocumentIndex": 11,
               "Title": "EntityBase.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\EntityBase.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\EntityBase.cs",
@@ -221,7 +232,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 11,
+              "DocumentIndex": 12,
               "Title": "Attributes.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\Attributes.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\Attributes.cs",
@@ -233,7 +244,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 12,
+              "DocumentIndex": 13,
               "Title": "User.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Models\\User.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Models\\User.cs",
@@ -245,7 +256,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 13,
+              "DocumentIndex": 14,
               "Title": "SqliteDbContext.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\SqliteDbContext.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\SqliteDbContext.cs",
@@ -257,7 +268,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 14,
+              "DocumentIndex": 15,
               "Title": "RepositoryBase.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\RepositoryBase.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\RepositoryBase.cs",
@@ -269,7 +280,7 @@
             },
             {
               "$type": "Document",
-              "DocumentIndex": 15,
+              "DocumentIndex": 16,
               "Title": "LogRepository.cs",
               "DocumentMoniker": "E:\\\u516C\u53F8\\\u9879\u76EE\\SqlDemo\\SqlDemo.Data\\Data\\LogRepository.cs",
               "RelativeDocumentMoniker": "SqlDemo.Data\\Data\\LogRepository.cs",

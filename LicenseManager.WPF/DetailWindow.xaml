@@ -31,6 +31,7 @@
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
                             <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
                         </Grid.RowDefinitions>
                         
                         <TextBlock Grid.Row="0" Grid.Column="0" Text="记录ID:" VerticalAlignment="Center"/>
@@ -45,17 +46,20 @@
                         <TextBlock Grid.Row="1" Grid.Column="2" Text="记录人:" VerticalAlignment="Center"/>
                         <TextBox Grid.Row="1" Grid.Column="3" x:Name="OperatorText" IsReadOnly="True" Background="#FFF0F0F0"/>
                         
-                        <TextBlock Grid.Row="2" Grid.Column="0" Text="项目号:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="ProjectNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="0" Text="申请人:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="1" x:Name="ApplicantText" IsReadOnly="True" Background="#FFF0F0F0"/>
                         
-                        <TextBlock Grid.Row="2" Grid.Column="2" Text="设备号:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="DeviceNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        <TextBlock Grid.Row="2" Grid.Column="2" Text="项目号:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="2" Grid.Column="3" x:Name="ProjectNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
                         
-                        <TextBlock Grid.Row="3" Grid.Column="0" Text="创建时间:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="CreatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        <TextBlock Grid.Row="3" Grid.Column="0" Text="设备号:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="3" Grid.Column="1" x:Name="DeviceNumberText" IsReadOnly="True" Background="#FFF0F0F0"/>
                         
-                        <TextBlock Grid.Row="3" Grid.Column="2" Text="更新时间:" VerticalAlignment="Center"/>
-                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="UpdatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        <TextBlock Grid.Row="3" Grid.Column="2" Text="创建时间:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="3" Grid.Column="3" x:Name="CreatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
+                        
+                        <TextBlock Grid.Row="4" Grid.Column="0" Text="更新时间:" VerticalAlignment="Center"/>
+                        <TextBox Grid.Row="4" Grid.Column="1" x:Name="UpdatedAtText" IsReadOnly="True" Background="#FFF0F0F0"/>
                     </Grid>
                 </GroupBox>
                 

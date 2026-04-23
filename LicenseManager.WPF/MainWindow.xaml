@@ -4,10 +4,15 @@
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
         xmlns:System="clr-namespace:System;assembly=mscorlib"
+        xmlns:local="clr-namespace:LicenseManager.WPF"
         mc:Ignorable="d"
         Title="授权码生成管理系统" Height="600" Width="900"
         WindowStartupLocation="CenterScreen"
         ResizeMode="CanResize">
+    <Window.Resources>
+        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
+        <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+    </Window.Resources>
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
@@ -58,12 +63,19 @@
                         </StackPanel>
                         
                         <StackPanel Margin="0,5">
+                            <TextBlock Text="申请人:" VerticalAlignment="Center"/>
+                            <TextBox x:Name="ApplicantText" Text=""/>
+                        </StackPanel>
+                        
+                        <StackPanel Margin="0,5">
                             <TextBlock Text="设备类型:" VerticalAlignment="Center"/>
                             <ComboBox x:Name="DeviceTypeCombo" SelectedIndex="0" SelectionChanged="DeviceTypeCombo_SelectionChanged">
                                 <ComboBoxItem>高速贴片机</ComboBoxItem>
                                 <ComboBoxItem>猎奇耦合测试机</ComboBoxItem>
                                 <ComboBoxItem>飞泰耦合测试机</ComboBoxItem>
                                 <ComboBoxItem>芯片测试机</ComboBoxItem>
+                                <ComboBoxItem>个人电脑</ComboBoxItem>
+                                <ComboBoxItem>共晶/固晶</ComboBoxItem>
                             </ComboBox>
                         </StackPanel>
                         
@@ -123,6 +135,8 @@
                             <ComboBoxItem>猎奇耦合测试机</ComboBoxItem>
                             <ComboBoxItem>飞泰耦合测试机</ComboBoxItem>
                             <ComboBoxItem>芯片测试机</ComboBoxItem>
+                            <ComboBoxItem>个人电脑</ComboBoxItem>
+                            <ComboBoxItem>共晶/固晶</ComboBoxItem>
                         </ComboBox>
                         <Button x:Name="SearchBtn" Content="搜索" Width="60" Margin="0,0,5,0" Click="SearchBtn_Click"/>
                         <Button x:Name="RefreshBtn" Content="刷新" Width="60" Click="RefreshBtn_Click"/>
@@ -130,21 +144,28 @@
                     
                     <DataGrid Grid.Row="2" x:Name="LicenseRecordGrid" AutoGenerateColumns="False" 
                               IsReadOnly="True" Margin="5" CanUserAddRows="False"
-                              SelectionMode="Single" SelectionChanged="LicenseRecordGrid_SelectionChanged">
+                              SelectionMode="Single" SelectionChanged="LicenseRecordGrid_SelectionChanged"
+                              BeginningEdit="LicenseRecordGrid_BeginningEdit">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
                             <DataGridTextColumn Header="记录时间" Binding="{Binding RecordTime, StringFormat=yyyy-MM-dd HH:mm}" Width="120"/>
                             <DataGridTextColumn Header="部门" Binding="{Binding Department}" Width="80"/>
                             <DataGridTextColumn Header="记录人" Binding="{Binding Operator}" Width="80"/>
-                            <DataGridTextColumn Header="项目号" Binding="{Binding ProjectNumber}" Width="100"/>
-                            <DataGridTextColumn Header="设备号" Binding="{Binding DeviceNumber}" Width="100"/>
-                            <DataGridTextColumn Header="机器码" Binding="{Binding MachineCodeShort}" Width="80"/>
-                            <DataGridTemplateColumn Header="操作" Width="120">
+                            <DataGridTextColumn Header="申请人" Binding="{Binding Applicant}" Width="80"/>
+                            <DataGridTextColumn Header="项目号" Binding="{Binding ProjectNumber}" Width="120"/>
+                            <DataGridTextColumn Header="设备类型" Binding="{Binding DeviceType}" Width="80"/>
+                            <DataGridTextColumn Header="机器码" Binding="{Binding MachineCodeShort}" Width="80" IsReadOnly="True"/>
+                            <DataGridTemplateColumn Header="操作" Width="170">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Content="导出" Width="50" Margin="2" Click="ExportRecordBtn_Click" Tag="{Binding Id}"/>
-                                            <Button Content="删除" Width="50" Margin="2" Click="DeleteRecordBtn_Click" Tag="{Binding Id}"/>
+                                            <Button Content="编辑" Width="45" Margin="2" Click="EditRecordBtn_Click" Tag="{Binding Id}"
+                                                    Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
+                                            <Button Content="保存" Width="45" Margin="2" Click="SaveEditBtn_Click" Tag="{Binding Id}"
+                                                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
+                                                    Background="#FF4CAF50" Foreground="White"/>
+                                            <Button Content="导出" Width="45" Margin="2" Click="ExportRecordBtn_Click" Tag="{Binding Id}"/>
+                                            <Button Content="删除" Width="45" Margin="2" Click="DeleteRecordBtn_Click" Tag="{Binding Id}"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
