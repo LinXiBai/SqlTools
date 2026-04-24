@@ -1,12 +1,59 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Security.Cryptography;
+using System.Text;
 
 namespace CoreToolkit.Data
 {
+    /// <summary>
+    /// DPAPI 密码加密辅助类（当前用户级别保护）
+    /// </summary>
+    internal static class PasswordProtector
+    {
+        /// <summary>
+        /// 加密明文密码
+        /// </summary>
+        public static string Encrypt(string plainText)
+        {
+            if (string.IsNullOrEmpty(plainText))
+                return null;
+            byte[] data = Encoding.UTF8.GetBytes(plainText);
+            byte[] encrypted = ProtectedData.Protect(data, null, DataProtectionScope.CurrentUser);
+            return Convert.ToBase64String(encrypted);
+        }
+
+        /// <summary>
+        /// 解密密码。如果解密失败（可能是旧版明文），则返回原文以兼容旧数据。
+        /// </summary>
+        public static string Decrypt(string cipherText)
+        {
+            if (string.IsNullOrEmpty(cipherText))
+                return null;
+            try
+            {
+                byte[] data = Convert.FromBase64String(cipherText);
+                byte[] decrypted = ProtectedData.Unprotect(data, null, DataProtectionScope.CurrentUser);
+                return Encoding.UTF8.GetString(decrypted);
+            }
+            catch (FormatException)
+            {
+                // 不是 Base64，说明是旧版明文，直接返回
+                return cipherText;
+            }
+            catch (CryptographicException)
+            {
+                // 解密失败（可能在其他用户环境下），返回原文尝试兼容
+                return cipherText;
+            }
+        }
+    }
     /// <summary>
     /// 数据库配置项
     /// </summary>
     public class DatabaseConfigItem
     {
+        private string _encryptedPassword;
+
         /// <summary>
         /// 配置名称（如：MainDb、LogDb）
         /// </summary>
@@ -18,9 +65,18 @@ namespace CoreToolkit.Data
         public string DbPath { get; set; }
 
         /// <summary>
-        /// 数据库密码（可选）
+        /// 数据库密码（可选）。设置时会自动加密，读取时自动解密。
         /// </summary>
-        public string Password { get; set; }
+        public string Password
+        {
+            get => string.IsNullOrEmpty(_encryptedPassword) ? null : PasswordProtector.Decrypt(_encryptedPassword);
+            set => _encryptedPassword = string.IsNullOrEmpty(value) ? null : PasswordProtector.Encrypt(value);
+        }
+
+        /// <summary>
+        /// 获取加密后的密码（用于持久化存储）
+        /// </summary>
+        internal string EncryptedPassword => _encryptedPassword;
 
         /// <summary>
         /// 是否启用 WAL 模式（提升并发性能）

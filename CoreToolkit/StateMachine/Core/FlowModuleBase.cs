@@ -105,6 +105,16 @@ namespace CoreToolkit.StateMachine.Core
         public event EventHandler<double> OnProgressChanged;
 
         /// <summary>
+        /// 进度报告接口（支持 IProgress&lt;ModuleProgress&gt;）
+        /// </summary>
+        public IProgress<ModuleProgress> Progress { get; set; }
+
+        /// <summary>
+        /// 最近一次取消操作产生的异常
+        /// </summary>
+        public Exception LastCancelException { get; protected set; }
+
+        /// <summary>
         /// 构造函数
         /// </summary>
         /// <param name="name">模块名称</param>
@@ -114,6 +124,22 @@ namespace CoreToolkit.StateMachine.Core
             Statistics.ModuleId = ModuleId;
             Statistics.ModuleName = Name;
             Statistics.Type = Type;
+        }
+
+        /// <summary>
+        /// 执行前钩子（子类可重写）
+        /// </summary>
+        protected virtual Task OnBeforeExecuteAsync(ExecutionContext context, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
+        }
+
+        /// <summary>
+        /// 执行后钩子（子类可重写）
+        /// </summary>
+        protected virtual Task OnAfterExecuteAsync(ExecutionContext context, bool success, CancellationToken cancellationToken)
+        {
+            return Task.CompletedTask;
         }
 
         /// <summary>
@@ -131,11 +157,15 @@ namespace CoreToolkit.StateMachine.Core
             Statistics.ModuleId = ModuleId;
             Statistics.ModuleName = Name;
             Statistics.Type = Type;
+            Statistics.Exception = null;
+            LastCancelException = null;
 
             bool timedOut = false;
 
             try
             {
+                await OnBeforeExecuteAsync(context, _cts.Token);
+
                 Status = ModuleStatus.Running;
                 _executionTimer.Restart();
                 _waitTimer.Stop();
@@ -164,7 +194,7 @@ namespace CoreToolkit.StateMachine.Core
                         Statistics.IsTimeout = true;
                         Statistics.IsSuccess = false;
                         Statistics.ErrorMessage = $"执行超时(设置:{TimeoutMs}ms, 实际:{_executionTimer.ElapsedMilliseconds}ms)";
-                        OnTimeoutOccurred?.Invoke(this, new TimeoutEventArgs
+                        OnRaiseTimeoutOccurred(new TimeoutEventArgs
                         {
                             ModuleId = ModuleId,
                             ModuleName = Name,
@@ -196,6 +226,7 @@ namespace CoreToolkit.StateMachine.Core
                             Statistics.IsSuccess = false;
                         }
 
+                        await OnAfterExecuteAsync(context, completed, _cts.Token);
                         return completed;
                     }
                 }
@@ -219,6 +250,7 @@ namespace CoreToolkit.StateMachine.Core
                 Status = ModuleStatus.Failed;
                 Statistics.IsSuccess = false;
                 Statistics.ErrorMessage = ex.Message;
+                Statistics.Exception = ex;
                 OnStatusChanged?.Invoke(this, new ModuleEventArgs
                 {
                     ModuleId = ModuleId,
@@ -226,6 +258,7 @@ namespace CoreToolkit.StateMachine.Core
                     OldStatus = ModuleStatus.Running,
                     NewStatus = ModuleStatus.Failed,
                     ErrorMessage = ex.Message,
+                    Exception = ex,
                     Timestamp = DateTime.Now
                 });
                 return false;
@@ -247,7 +280,16 @@ namespace CoreToolkit.StateMachine.Core
         /// </summary>
         public virtual void Cancel()
         {
-            _cts?.Cancel();
+            try
+            {
+                _cts?.Cancel();
+            }
+            catch (Exception ex)
+            {
+                LastCancelException = ex;
+                System.Diagnostics.Debug.WriteLine($"[FlowModuleBase] Cancel 异常 ({Name}): {ex}");
+            }
+
             if (Status == ModuleStatus.Running || Status == ModuleStatus.Waiting)
             {
                 Status = ModuleStatus.Cancelled;
@@ -269,6 +311,7 @@ namespace CoreToolkit.StateMachine.Core
                 ModuleName = Name,
                 Type = Type
             };
+            LastCancelException = null;
             _executionTimer.Reset();
             _waitTimer.Reset();
         }
@@ -279,7 +322,34 @@ namespace CoreToolkit.StateMachine.Core
         /// <param name="progress">进度值（0-1）</param>
         protected void ReportProgress(double progress)
         {
-            OnProgressChanged?.Invoke(this, Math.Max(0, Math.Min(1, progress)));
+            var clamped = Math.Max(0, Math.Min(1, progress));
+            OnProgressChanged?.Invoke(this, clamped);
+            Progress?.Report(new ModuleProgress
+            {
+                ModuleId = ModuleId,
+                ModuleName = Name,
+                OverallProgress = clamped,
+                Timestamp = DateTime.Now
+            });
+        }
+
+        /// <summary>
+        /// 报告带步骤信息的进度
+        /// </summary>
+        protected void ReportProgress(double progress, string stepName, double stepProgress = -1, string message = null)
+        {
+            var clamped = Math.Max(0, Math.Min(1, progress));
+            OnProgressChanged?.Invoke(this, clamped);
+            Progress?.Report(new ModuleProgress
+            {
+                ModuleId = ModuleId,
+                ModuleName = Name,
+                StepName = stepName,
+                OverallProgress = clamped,
+                StepProgress = stepProgress >= 0 ? stepProgress : clamped,
+                Message = message,
+                Timestamp = DateTime.Now
+            });
         }
 
         /// <summary>

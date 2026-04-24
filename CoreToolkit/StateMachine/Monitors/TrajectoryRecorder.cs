@@ -19,6 +19,7 @@ namespace CoreToolkit.StateMachine.Monitors
         private Task _recordTask;
         private CancellationTokenSource _cts;
         private readonly Stopwatch _sw = new Stopwatch();
+        private readonly object _recordLock = new object();
 
         /// <summary>
         /// 轨迹记录
@@ -168,7 +169,10 @@ namespace CoreToolkit.StateMachine.Monitors
                         }
                     }
 
-                    Record.Points.Add(point);
+                    lock (_recordLock)
+                    {
+                        Record.Points.Add(point);
+                    }
 
                     await Task.Delay(sampleIntervalMs, cancellationToken).ConfigureAwait(false);
                 }
@@ -183,19 +187,24 @@ namespace CoreToolkit.StateMachine.Monitors
         /// </summary>
         public TrajectoryPoint[] GetSimplifiedPoints(int targetCount = 1000)
         {
-            if (Record?.Points == null || Record.Points.Count == 0)
-                return new TrajectoryPoint[0];
+            List<TrajectoryPoint> snapshot;
+            lock (_recordLock)
+            {
+                if (Record?.Points == null || Record.Points.Count == 0)
+                    return new TrajectoryPoint[0];
+                snapshot = new List<TrajectoryPoint>(Record.Points);
+            }
 
-            if (Record.Points.Count <= targetCount)
-                return Record.Points.ToArray();
+            if (snapshot.Count <= targetCount)
+                return snapshot.ToArray();
 
             var result = new List<TrajectoryPoint>();
-            var step = (double)Record.Points.Count / targetCount;
+            var step = (double)snapshot.Count / targetCount;
 
             for (int i = 0; i < targetCount; i++)
             {
                 int index = (int)(i * step);
-                result.Add(Record.Points[index]);
+                result.Add(snapshot[index]);
             }
 
             return result.ToArray();
@@ -206,12 +215,17 @@ namespace CoreToolkit.StateMachine.Monitors
         /// </summary>
         public TrajectoryStatistics CalculateStatistics()
         {
-            if (Record?.Points == null || Record.Points.Count < 2)
-                return null;
+            List<TrajectoryPoint> snapshot;
+            lock (_recordLock)
+            {
+                if (Record?.Points == null || Record.Points.Count < 2)
+                    return null;
+                snapshot = new List<TrajectoryPoint>(Record.Points);
+            }
 
             var stats = new TrajectoryStatistics
             {
-                DurationMs = Record.Points[Record.Points.Count - 1].ElapsedMs - Record.Points[0].ElapsedMs,
+                DurationMs = snapshot[snapshot.Count - 1].ElapsedMs - snapshot[0].ElapsedMs,
                 AxisStatistics = new AxisTrajectoryStatistics[Record.AxisCount]
             };
 
@@ -228,7 +242,7 @@ namespace CoreToolkit.StateMachine.Monitors
                 double totalDistance = 0;
                 double? lastPos = null;
 
-                foreach (var point in Record.Points)
+                foreach (var point in snapshot)
                 {
                     var pos = point.Positions[axis];
                     var vel = point.Velocities[axis];
@@ -252,10 +266,10 @@ namespace CoreToolkit.StateMachine.Monitors
 
                 axisStats.AverageVelocity = totalDistance / (stats.DurationMs / 1000.0);
 
-                axisStats.StartPosition = Record.Points[0].Positions[axis];
-                axisStats.EndPosition = Record.Points[Record.Points.Count - 1].Positions[axis];
+                axisStats.StartPosition = snapshot[0].Positions[axis];
+                axisStats.EndPosition = snapshot[snapshot.Count - 1].Positions[axis];
 
-                // axisStats assigned to parent already
+                stats.AxisStatistics[axis] = axisStats;
             }
 
             return stats;
@@ -266,8 +280,13 @@ namespace CoreToolkit.StateMachine.Monitors
         /// </summary>
         public string ExportToCsv()
         {
-            if (Record?.Points == null || Record.Points.Count == 0)
-                return string.Empty;
+            List<TrajectoryPoint> snapshot;
+            lock (_recordLock)
+            {
+                if (Record?.Points == null || Record.Points.Count == 0)
+                    return string.Empty;
+                snapshot = new List<TrajectoryPoint>(Record.Points);
+            }
 
             var lines = new List<string>();
 
@@ -282,7 +301,7 @@ namespace CoreToolkit.StateMachine.Monitors
             lines.Add(string.Join(",", headers));
 
             // 数据
-            foreach (var point in Record.Points)
+            foreach (var point in snapshot)
             {
                 var values = new List<string> { point.ElapsedMs.ToString("F2") };
                 for (int i = 0; i < Record.AxisCount; i++)

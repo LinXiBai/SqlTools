@@ -84,43 +84,55 @@ namespace CoreToolkit.StateMachine.Modules
         }
 
         /// <summary>
-        /// 执行模块逻辑
+        /// 执行模块逻辑（支持断点续传）
         /// </summary>
         /// <param name="context">执行上下文</param>
         /// <param name="cancellationToken">取消令牌</param>
         /// <returns>执行结果</returns>
         protected override async Task<bool> ExecuteInternalAsync(ExecutionContext context, CancellationToken cancellationToken)
         {
-            for (int i = 0; i < _modules.Count; i++)
+            // 断点续传：从上次保存的索引继续
+            string resumeKey = $"Sequential_{ModuleId}_Index";
+            int startIndex = context.GetResult<int>(resumeKey, 0);
+
+            for (int i = startIndex; i < _modules.Count; i++)
+            {
+                cancellationToken.ThrowIfCancellationRequested();
+
+                var module = _modules[i];
+                ReportProgress((double)i / _modules.Count, $"步骤 {i + 1}/{_modules.Count}: {module.Name}");
+
+                var remainingTimeout = TimeoutMs - (int)this._executionTimer.ElapsedMilliseconds;
+                if (remainingTimeout <= 0)
                 {
-                    cancellationToken.ThrowIfCancellationRequested();
-
-                    var module = _modules[i];
-                    ReportProgress((double)i / _modules.Count);
-
-                    var remainingTimeout = TimeoutMs - (int)this._executionTimer.ElapsedMilliseconds;
-                    if (remainingTimeout <= 0)
-                    {
-                        throw new TimeoutException("容器执行超时");
-                    }
-                    var originalTimeout = module.TimeoutMs;
-                    try
-                    {
-                        module.TimeoutMs = Math.Min(originalTimeout, remainingTimeout);
-                        var success = await module.ExecuteAsync(context);
-                        if (!success)
-                        {
-                            Statistics.ErrorMessage = $"子模块 '{module.Name}' 执行失败: {module.Statistics.ErrorMessage}";
-                            return false;
-                        }
-                    }
-                    finally
-                    {
-                        module.TimeoutMs = originalTimeout;
-                    }
+                    // 保存当前索引以便续传
+                    context.SetResult(resumeKey, i);
+                    throw new TimeoutException("容器执行超时");
                 }
+                var originalTimeout = module.TimeoutMs;
+                try
+                {
+                    module.TimeoutMs = Math.Min(originalTimeout, remainingTimeout);
+                    var success = await module.ExecuteAsync(context);
+                    if (!success)
+                    {
+                        Statistics.ErrorMessage = $"子模块 '{module.Name}' 执行失败: {module.Statistics.ErrorMessage}";
+                        if (module.Statistics.Exception != null)
+                            Statistics.Exception = module.Statistics.Exception;
+                        return false;
+                    }
+                    // 成功执行后保存进度
+                    context.SetResult(resumeKey, i + 1);
+                }
+                finally
+                {
+                    module.TimeoutMs = originalTimeout;
+                }
+            }
 
-            ReportProgress(1.0);
+            // 完成后清除断点
+            context.Results.TryRemove(resumeKey, out _);
+            ReportProgress(1.0, "完成", 1.0);
             return true;
         }
 

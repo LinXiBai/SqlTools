@@ -1,4 +1,5 @@
 using System;
+using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Diagnostics;
 
@@ -105,6 +106,8 @@ namespace CoreToolkit.StateMachine.Models
         public DateTime Timestamp { get; set; }
         /// <summary>错误信息</summary>
         public string ErrorMessage { get; set; }
+        /// <summary>异常对象（完整异常信息，便于调试）</summary>
+        public Exception Exception { get; set; }
     }
 
     /// <summary>
@@ -160,6 +163,8 @@ namespace CoreToolkit.StateMachine.Models
         public bool IsSuccess { get; set; }
         /// <summary>错误信息</summary>
         public string ErrorMessage { get; set; }
+        /// <summary>异常对象（完整异常信息）</summary>
+        public Exception Exception { get; set; }
     }
 
     /// <summary>
@@ -187,6 +192,8 @@ namespace CoreToolkit.StateMachine.Models
         public bool IsSuccess { get; set; }
         /// <summary>错误信息</summary>
         public string ErrorMessage { get; set; }
+        /// <summary>异常对象（完整异常信息）</summary>
+        public Exception Exception { get; set; }
     }
 
     /// <summary>
@@ -196,12 +203,12 @@ namespace CoreToolkit.StateMachine.Models
     {
         /// <summary>上下文ID</summary>
         public string ContextId { get; set; } = Guid.NewGuid().ToString("N");
-        /// <summary>流程参数</summary>
-        public Dictionary<string, object> Parameters { get; set; } = new Dictionary<string, object>();
-        /// <summary>执行结果</summary>
-        public Dictionary<string, object> Results { get; set; } = new Dictionary<string, object>();
-        /// <summary>共享数据</summary>
-        public Dictionary<string, object> SharedData { get; set; } = new Dictionary<string, object>();
+        /// <summary>流程参数（线程安全）</summary>
+        public ConcurrentDictionary<string, object> Parameters { get; set; } = new ConcurrentDictionary<string, object>();
+        /// <summary>执行结果（线程安全）</summary>
+        public ConcurrentDictionary<string, object> Results { get; set; } = new ConcurrentDictionary<string, object>();
+        /// <summary>共享数据（线程安全）</summary>
+        public ConcurrentDictionary<string, object> SharedData { get; set; } = new ConcurrentDictionary<string, object>();
         /// <summary>取消令牌</summary>
         public System.Threading.CancellationToken CancellationToken { get; set; }
         /// <summary>父上下文</summary>

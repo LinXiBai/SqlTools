@@ -1,6 +1,7 @@
 using System;
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using CoreToolkit.Data.Models;
 using Dapper;
 
 namespace CoreToolkit.Data
@@ -298,6 +299,211 @@ namespace CoreToolkit.Data
                 _db.EnsureOpen();
                 return await _db.Connection.QueryAsync<LicenseRecord>(sql, parameters);
             });
+        }
+
+        /// <summary>
+        /// 分页查询授权记录（支持模糊搜索和复合条件）
+        /// </summary>
+        public PagedResult<LicenseRecord> SearchPaged(string keyword = null,
+            string department = null, string operatorName = null, string applicant = null,
+            string deviceType = null, DateTime? startDate = null, DateTime? endDate = null,
+            string sortColumn = "RecordTime", bool sortDescending = true,
+            int pageIndex = 0, int pageSize = 50)
+        {
+            var conditions = new List<string>();
+            var parameters = new DynamicParameters();
+
+            // 全局关键词模糊搜索
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                conditions.Add("(ProjectNumber LIKE @Keyword OR DeviceNumber LIKE @Keyword OR Applicant LIKE @Keyword OR Operator LIKE @Keyword OR Department LIKE @Keyword)");
+                parameters.Add("Keyword", $"%{keyword}%");
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                conditions.Add("Department = @Department");
+                parameters.Add("Department", department);
+            }
+
+            if (!string.IsNullOrEmpty(operatorName))
+            {
+                conditions.Add("Operator = @Operator");
+                parameters.Add("Operator", operatorName);
+            }
+
+            if (!string.IsNullOrEmpty(applicant))
+            {
+                conditions.Add("Applicant = @Applicant");
+                parameters.Add("Applicant", applicant);
+            }
+
+            if (!string.IsNullOrEmpty(deviceType))
+            {
+                conditions.Add("DeviceType = @DeviceType");
+                parameters.Add("DeviceType", deviceType);
+            }
+
+            if (startDate.HasValue)
+            {
+                conditions.Add("RecordTime >= @StartDate");
+                parameters.Add("StartDate", startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                conditions.Add("RecordTime <= @EndDate");
+                parameters.Add("EndDate", endDate.Value);
+            }
+
+            var whereClause = conditions.Count > 0 ? $"WHERE {string.Join(" AND ", conditions)}" : "";
+
+            // 排序列白名单，防止 SQL 注入
+            var allowedSortColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Id", "RecordTime", "Department", "Operator", "Applicant",
+                "ProjectNumber", "DeviceNumber", "DeviceType", "CreatedAt"
+            };
+            if (!allowedSortColumns.Contains(sortColumn))
+                sortColumn = "RecordTime";
+            var sortDir = sortDescending ? "DESC" : "ASC";
+
+            // 查询总数
+            var countSql = $"SELECT COUNT(*) FROM {TableName} {whereClause}";
+            var totalCount = _db.ExecuteScalar<long>(countSql, parameters);
+
+            // 查询分页数据
+            var dataSql = $"SELECT * FROM {TableName} {whereClause} ORDER BY {sortColumn} {sortDir} LIMIT @PageSize OFFSET @Offset";
+            parameters.Add("PageSize", pageSize);
+            parameters.Add("Offset", pageIndex * pageSize);
+
+            var items = _db.Query<LicenseRecord>(dataSql, parameters);
+
+            return new PagedResult<LicenseRecord>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+
+        /// <summary>
+        /// 异步分页查询授权记录
+        /// </summary>
+        public async Task<PagedResult<LicenseRecord>> SearchPagedAsync(string keyword = null,
+            string department = null, string operatorName = null, string applicant = null,
+            string deviceType = null, DateTime? startDate = null, DateTime? endDate = null,
+            string sortColumn = "RecordTime", bool sortDescending = true,
+            int pageIndex = 0, int pageSize = 50)
+        {
+            var conditions = new List<string>();
+            var parameters = new DynamicParameters();
+
+            if (!string.IsNullOrWhiteSpace(keyword))
+            {
+                conditions.Add("(ProjectNumber LIKE @Keyword OR DeviceNumber LIKE @Keyword OR Applicant LIKE @Keyword OR Operator LIKE @Keyword OR Department LIKE @Keyword)");
+                parameters.Add("Keyword", $"%{keyword}%");
+            }
+
+            if (!string.IsNullOrEmpty(department))
+            {
+                conditions.Add("Department = @Department");
+                parameters.Add("Department", department);
+            }
+
+            if (!string.IsNullOrEmpty(operatorName))
+            {
+                conditions.Add("Operator = @Operator");
+                parameters.Add("Operator", operatorName);
+            }
+
+            if (!string.IsNullOrEmpty(applicant))
+            {
+                conditions.Add("Applicant = @Applicant");
+                parameters.Add("Applicant", applicant);
+            }
+
+            if (!string.IsNullOrEmpty(deviceType))
+            {
+                conditions.Add("DeviceType = @DeviceType");
+                parameters.Add("DeviceType", deviceType);
+            }
+
+            if (startDate.HasValue)
+            {
+                conditions.Add("RecordTime >= @StartDate");
+                parameters.Add("StartDate", startDate.Value);
+            }
+
+            if (endDate.HasValue)
+            {
+                conditions.Add("RecordTime <= @EndDate");
+                parameters.Add("EndDate", endDate.Value);
+            }
+
+            var whereClause = conditions.Count > 0 ? $"WHERE {string.Join(" AND ", conditions)}" : "";
+
+            var allowedSortColumns = new HashSet<string>(StringComparer.OrdinalIgnoreCase)
+            {
+                "Id", "RecordTime", "Department", "Operator", "Applicant",
+                "ProjectNumber", "DeviceNumber", "DeviceType", "CreatedAt"
+            };
+            if (!allowedSortColumns.Contains(sortColumn))
+                sortColumn = "RecordTime";
+            var sortDir = sortDescending ? "DESC" : "ASC";
+
+            var countSql = $"SELECT COUNT(*) FROM {TableName} {whereClause}";
+            var totalCount = await _db.ExecuteWithLockAsync(async () =>
+            {
+                _db.EnsureOpen();
+                return await _db.Connection.ExecuteScalarAsync<long>(countSql, parameters);
+            });
+
+            var dataSql = $"SELECT * FROM {TableName} {whereClause} ORDER BY {sortColumn} {sortDir} LIMIT @PageSize OFFSET @Offset";
+            parameters.Add("PageSize", pageSize);
+            parameters.Add("Offset", pageIndex * pageSize);
+
+            var items = await _db.ExecuteWithLockAsync(async () =>
+            {
+                _db.EnsureOpen();
+                return await _db.Connection.QueryAsync<LicenseRecord>(dataSql, parameters);
+            });
+
+            return new PagedResult<LicenseRecord>
+            {
+                Items = items,
+                TotalCount = totalCount,
+                PageIndex = pageIndex,
+                PageSize = pageSize
+            };
+        }
+
+        /// <summary>
+        /// 获取去重后的设备类型列表
+        /// </summary>
+        public IEnumerable<string> GetDistinctDeviceTypes()
+        {
+            string sql = $"SELECT DISTINCT DeviceType FROM {TableName} WHERE DeviceType IS NOT NULL AND DeviceType != '' ORDER BY DeviceType";
+            return _db.Query<string>(sql);
+        }
+
+        /// <summary>
+        /// 获取去重后的部门列表
+        /// </summary>
+        public IEnumerable<string> GetDistinctDepartments()
+        {
+            string sql = $"SELECT DISTINCT Department FROM {TableName} WHERE Department IS NOT NULL AND Department != '' ORDER BY Department";
+            return _db.Query<string>(sql);
+        }
+
+        /// <summary>
+        /// 获取去重后的记录人列表
+        /// </summary>
+        public IEnumerable<string> GetDistinctOperators()
+        {
+            string sql = $"SELECT DISTINCT Operator FROM {TableName} WHERE Operator IS NOT NULL AND Operator != '' ORDER BY Operator";
+            return _db.Query<string>(sql);
         }
 
         /// <summary>

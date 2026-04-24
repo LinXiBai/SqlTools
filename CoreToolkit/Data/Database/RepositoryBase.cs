@@ -5,6 +5,7 @@ using System.IO;
 using System.Linq;
 using System.Reflection;
 using System.Text;
+using System.Text.RegularExpressions;
 using System.Threading.Tasks;
 using Dapper;
 using Newtonsoft.Json;
@@ -400,20 +401,215 @@ namespace CoreToolkit.Data
             OutputDatabaseOperationEntry("Delete", null, affectedRows, id);
         }
 
+        // 预编译的正则表达式，用于验证安全的 where 子句（仅允许：Column = @Param 形式）
+        private static readonly Regex SafeWhereClausePattern = new Regex(
+            @"^[\s]*[a-zA-Z_][a-zA-Z0-9_]*[\s]*=[\s]*@[a-zA-Z_][a-zA-Z0-9_]*[\s]*$",
+            RegexOptions.Compiled);
+
         /// <summary>
-        /// 条件查询
+        /// 验证 where 子句是否安全（防止 SQL 注入）
         /// </summary>
-        public IEnumerable<T> Query(string whereClause, object param = null)
+        private void ValidateWhereClause(string whereClause)
         {
+            if (string.IsNullOrWhiteSpace(whereClause))
+                throw new ArgumentException("Where clause cannot be empty.", nameof(whereClause));
+
+            // 基础黑名单检测：拒绝包含 SQL 分隔符和危险关键字的输入
+            var upper = whereClause.ToUpperInvariant();
+            // 注意：不使用 "OR " / "AND " 的简单 Contains，避免误杀 ColumnName 中包含 OR/AND 的合法字段（如 Operator、Color 等）
+            string[] dangerousTokens = { ";", "--", "/*", "*/", "DROP", "DELETE", "UPDATE",
+                "INSERT", "ALTER", "CREATE", "EXEC", "UNION", "SELECT", "FROM", "WHERE" };
+            foreach (var token in dangerousTokens)
+            {
+                if (upper.Contains(token))
+                    throw new ArgumentException($"Potentially unsafe SQL token detected: '{token.Trim()}'. Use parameterized safe methods instead.", nameof(whereClause));
+            }
+
+            // 必须匹配安全的单条件模式
+            if (!SafeWhereClausePattern.IsMatch(whereClause))
+                throw new ArgumentException("Where clause does not match the safe pattern 'Column = @Parameter'. Use safe query methods instead.", nameof(whereClause));
+        }
+
+        /// <summary>
+        /// 按单字段条件查询（安全，防注入）
+        /// </summary>
+        public IEnumerable<T> QueryByField(string fieldName, object value)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw new ArgumentException("Field name cannot be empty.", nameof(fieldName));
+            if (!IsSafeIdentifier(fieldName))
+                throw new ArgumentException("Field name contains unsafe characters.", nameof(fieldName));
+
+            string sql = $"SELECT * FROM {TableName} WHERE {fieldName} = @Value";
+            return _db.Query<T>(sql, new { Value = value });
+        }
+
+        /// <summary>
+        /// 异步按单字段条件查询（安全，防注入）
+        /// </summary>
+        public async Task<IEnumerable<T>> QueryByFieldAsync(string fieldName, object value)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw new ArgumentException("Field name cannot be empty.", nameof(fieldName));
+            if (!IsSafeIdentifier(fieldName))
+                throw new ArgumentException("Field name contains unsafe characters.", nameof(fieldName));
+
+            string sql = $"SELECT * FROM {TableName} WHERE {fieldName} = @Value";
+            return await _db.ExecuteWithLockAsync(async () =>
+            {
+                _db.EnsureOpen();
+                return await _db.Connection.QueryAsync<T>(sql, new { Value = value });
+            });
+        }
+
+        /// <summary>
+        /// 按多字段条件 AND 查询（安全，防注入）
+        /// </summary>
+        public IEnumerable<T> QueryByFields(Dictionary<string, object> conditions)
+        {
+            if (conditions == null || conditions.Count == 0)
+                return GetAll();
+
+            var parameters = new DynamicParameters();
+            var clauses = new List<string>();
+            int index = 0;
+            foreach (var kvp in conditions)
+            {
+                if (!IsSafeIdentifier(kvp.Key))
+                    throw new ArgumentException($"Field name '{kvp.Key}' contains unsafe characters.");
+                string paramName = $"p{index}";
+                clauses.Add($"{kvp.Key} = @{paramName}");
+                parameters.Add(paramName, kvp.Value);
+                index++;
+            }
+
+            string sql = $"SELECT * FROM {TableName} WHERE {string.Join(" AND ", clauses)}";
+            return _db.Query<T>(sql, parameters);
+        }
+
+        /// <summary>
+        /// 异步按多字段条件 AND 查询（安全，防注入）
+        /// </summary>
+        public async Task<IEnumerable<T>> QueryByFieldsAsync(Dictionary<string, object> conditions)
+        {
+            if (conditions == null || conditions.Count == 0)
+                return await GetAllAsync();
+
+            var parameters = new DynamicParameters();
+            var clauses = new List<string>();
+            int index = 0;
+            foreach (var kvp in conditions)
+            {
+                if (!IsSafeIdentifier(kvp.Key))
+                    throw new ArgumentException($"Field name '{kvp.Key}' contains unsafe characters.");
+                string paramName = $"p{index}";
+                clauses.Add($"{kvp.Key} = @{paramName}");
+                parameters.Add(paramName, kvp.Value);
+                index++;
+            }
+
+            string sql = $"SELECT * FROM {TableName} WHERE {string.Join(" AND ", clauses)}";
+            return await _db.ExecuteWithLockAsync(async () =>
+            {
+                _db.EnsureOpen();
+                return await _db.Connection.QueryAsync<T>(sql, parameters);
+            });
+        }
+
+        /// <summary>
+        /// 按字段 IN 条件查询（安全，防注入）
+        /// </summary>
+        public IEnumerable<T> QueryIn<TValue>(string fieldName, IEnumerable<TValue> values)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw new ArgumentException("Field name cannot be empty.", nameof(fieldName));
+            if (!IsSafeIdentifier(fieldName))
+                throw new ArgumentException("Field name contains unsafe characters.", nameof(fieldName));
+
+            var valueList = values?.ToList() ?? new List<TValue>();
+            if (valueList.Count == 0)
+                return new List<T>();
+
+            var parameters = new DynamicParameters();
+            var paramNames = new List<string>();
+            for (int i = 0; i < valueList.Count; i++)
+            {
+                string paramName = $"p{i}";
+                paramNames.Add($"@{paramName}");
+                parameters.Add(paramName, valueList[i]);
+            }
+
+            string sql = $"SELECT * FROM {TableName} WHERE {fieldName} IN ({string.Join(", ", paramNames)})";
+            return _db.Query<T>(sql, parameters);
+        }
+
+        /// <summary>
+        /// 异步按字段 IN 条件查询（安全，防注入）
+        /// </summary>
+        public async Task<IEnumerable<T>> QueryInAsync<TValue>(string fieldName, IEnumerable<TValue> values)
+        {
+            if (string.IsNullOrWhiteSpace(fieldName))
+                throw new ArgumentException("Field name cannot be empty.", nameof(fieldName));
+            if (!IsSafeIdentifier(fieldName))
+                throw new ArgumentException("Field name contains unsafe characters.", nameof(fieldName));
+
+            var valueList = values?.ToList() ?? new List<TValue>();
+            if (valueList.Count == 0)
+                return new List<T>();
+
+            var parameters = new DynamicParameters();
+            var paramNames = new List<string>();
+            for (int i = 0; i < valueList.Count; i++)
+            {
+                string paramName = $"p{i}";
+                paramNames.Add($"@{paramName}");
+                parameters.Add(paramName, valueList[i]);
+            }
+
+            string sql = $"SELECT * FROM {TableName} WHERE {fieldName} IN ({string.Join(", ", paramNames)})";
+            return await _db.ExecuteWithLockAsync(async () =>
+            {
+                _db.EnsureOpen();
+                return await _db.Connection.QueryAsync<T>(sql, parameters);
+            });
+        }
+
+        /// <summary>
+        /// 判断标识符是否安全（仅允许字母、数字、下划线）
+        /// </summary>
+        private bool IsSafeIdentifier(string identifier)
+        {
+            if (string.IsNullOrEmpty(identifier))
+                return false;
+            for (int i = 0; i < identifier.Length; i++)
+            {
+                char c = identifier[i];
+                if (i == 0 && !(char.IsLetter(c) || c == '_'))
+                    return false;
+                if (!(char.IsLetterOrDigit(c) || c == '_'))
+                    return false;
+            }
+            return true;
+        }
+
+        /// <summary>
+        /// 条件查询（仅限内部/子类使用，存在 SQL 注入风险）
+        /// </summary>
+        [Obsolete("存在 SQL 注入风险，请使用 QueryByField/QueryByFields/QueryIn 等安全方法。此方法将在后续版本中移除。")]
+        protected IEnumerable<T> Query(string whereClause, object param = null)
+        {
+            ValidateWhereClause(whereClause);
             string sql = $"SELECT * FROM {TableName} WHERE {whereClause}";
             return _db.Query<T>(sql, param);
         }
 
         /// <summary>
-        /// 异步条件查询
+        /// 异步条件查询（仅限内部/子类使用，存在 SQL 注入风险）
         /// </summary>
-        public async Task<IEnumerable<T>> QueryAsync(string whereClause, object param = null)
+        [Obsolete("存在 SQL 注入风险，请使用 QueryByFieldAsync/QueryByFieldsAsync/QueryInAsync 等安全方法。此方法将在后续版本中移除。")]
+        protected async Task<IEnumerable<T>> QueryAsync(string whereClause, object param = null)
         {
+            ValidateWhereClause(whereClause);
             string sql = $"SELECT * FROM {TableName} WHERE {whereClause}";
             return await _db.ExecuteWithLockAsync(async () =>
             {

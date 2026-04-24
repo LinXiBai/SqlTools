@@ -3,194 +3,341 @@
         xmlns:x="http://schemas.microsoft.com/winfx/2006/xaml"
         xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
         xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
-        xmlns:System="clr-namespace:System;assembly=mscorlib"
         xmlns:local="clr-namespace:LicenseManager.WPF"
+        xmlns:vm="clr-namespace:LicenseManager.WPF.ViewModels"
         mc:Ignorable="d"
-        Title="授权码生成管理系统" Height="600" Width="900"
+        Title="授权码生成管理系统" 
+        Height="800" Width="1400"
         WindowStartupLocation="CenterScreen"
-        ResizeMode="CanResize">
+        Background="#FFF0F0F0"
+        FontSize="13">
+
     <Window.Resources>
-        <local:BoolToVisibilityConverter x:Key="BoolToVisibilityConverter"/>
-        <local:InverseBoolToVisibilityConverter x:Key="InverseBoolToVisibilityConverter"/>
+        <BooleanToVisibilityConverter x:Key="BoolToVis"/>
+        <local:InverseBoolToVisibilityConverter x:Key="InvBoolToVis"/>
+
+        <Style x:Key="CardBorderStyle" TargetType="Border">
+            <Setter Property="Background" Value="White"/>
+            <Setter Property="CornerRadius" Value="6"/>
+            <Setter Property="BorderBrush" Value="#FFE0E0E0"/>
+            <Setter Property="BorderThickness" Value="1"/>
+            <Setter Property="Padding" Value="14,10"/>
+            <Setter Property="Margin" Value="4"/>
+            <Setter Property="Effect">
+                <Setter.Value>
+                    <DropShadowEffect ShadowDepth="1" BlurRadius="4" Opacity="0.12"/>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="StatValueStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="24"/>
+            <Setter Property="FontWeight" Value="Bold"/>
+        </Style>
+
+        <Style x:Key="StatLabelStyle" TargetType="TextBlock">
+            <Setter Property="FontSize" Value="11"/>
+            <Setter Property="Foreground" Value="#FF888888"/>
+            <Setter Property="Margin" Value="0,4,0,0"/>
+        </Style>
+
+        <Style TargetType="Button">
+            <Setter Property="Padding" Value="14,5"/>
+            <Setter Property="Margin" Value="3"/>
+            <Setter Property="Background" Value="#FF2196F3"/>
+            <Setter Property="Foreground" Value="White"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FF1976D2"/>
+                            </Trigger>
+                            <Trigger Property="IsEnabled" Value="False">
+                                <Setter Property="Background" Value="#FFCCCCCC"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
+
+        <Style x:Key="SecondaryButtonStyle" TargetType="Button">
+            <Setter Property="Padding" Value="12,4"/>
+            <Setter Property="Margin" Value="2"/>
+            <Setter Property="Background" Value="#FFE0E0E0"/>
+            <Setter Property="Foreground" Value="#FF333333"/>
+            <Setter Property="BorderThickness" Value="0"/>
+            <Setter Property="Cursor" Value="Hand"/>
+            <Setter Property="Template">
+                <Setter.Value>
+                    <ControlTemplate TargetType="Button">
+                        <Border Background="{TemplateBinding Background}" CornerRadius="4" Padding="{TemplateBinding Padding}">
+                            <ContentPresenter HorizontalAlignment="Center" VerticalAlignment="Center"/>
+                        </Border>
+                        <ControlTemplate.Triggers>
+                            <Trigger Property="IsMouseOver" Value="True">
+                                <Setter Property="Background" Value="#FFD0D0D0"/>
+                            </Trigger>
+                        </ControlTemplate.Triggers>
+                    </ControlTemplate>
+                </Setter.Value>
+            </Setter>
+        </Style>
     </Window.Resources>
+
     <Grid>
         <Grid.RowDefinitions>
             <RowDefinition Height="Auto"/>
+            <RowDefinition Height="Auto"/>
             <RowDefinition Height="*"/>
-            <RowDefinition Height="200"/>
         </Grid.RowDefinitions>
-        
-        <Border Grid.Row="0" Background="#FF2D2D30" Padding="15,10">
-            <TextBlock Text="授权码生成管理系统" 
-                       Foreground="White" FontSize="18" FontWeight="Bold"/>
+
+        <!-- 标题栏 -->
+        <Border Grid.Row="0" Background="#FF2D2D30" Height="50">
+            <Grid>
+                <TextBlock Text="授权码生成管理系统" 
+                           Foreground="White" FontSize="18" FontWeight="Bold"
+                           VerticalAlignment="Center" Margin="20,0"/>
+                <StackPanel Orientation="Horizontal" HorizontalAlignment="Right" VerticalAlignment="Center" Margin="0,0,20,0">
+                    <Button Content="刷新统计" Command="{Binding RefreshStatsCommand}" 
+                            Background="#FF4CAF50" Padding="10,4" Margin="0,0,6,0"/>
+                    <Button Content="导出当前筛选" Command="{Binding ExportCommand}" 
+                            Background="#FFFF9800" Padding="10,4"/>
+                </StackPanel>
+            </Grid>
         </Border>
-        
-        <Grid Grid.Row="1" Margin="10">
+
+        <!-- 仪表盘 -->
+        <UniformGrid Grid.Row="1" Columns="5" Margin="12,10,12,6">
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatTotalCount}" Style="{StaticResource StatValueStyle}" Foreground="#FF2196F3"/>
+                    <TextBlock Text="总记录数" Style="{StaticResource StatLabelStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatProjectCount}" Style="{StaticResource StatValueStyle}" Foreground="#FF4CAF50"/>
+                    <TextBlock Text="项目数" Style="{StaticResource StatLabelStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatDeviceCount}" Style="{StaticResource StatValueStyle}" Foreground="#FFFF9800"/>
+                    <TextBlock Text="设备数" Style="{StaticResource StatLabelStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatDepartmentCount}" Style="{StaticResource StatValueStyle}" Foreground="#FF9C27B0"/>
+                    <TextBlock Text="部门数" Style="{StaticResource StatLabelStyle}"/>
+                </StackPanel>
+            </Border>
+            <Border Style="{StaticResource CardBorderStyle}">
+                <StackPanel>
+                    <TextBlock Text="{Binding StatOperatorCount}" Style="{StaticResource StatValueStyle}" Foreground="#FFF44336"/>
+                    <TextBlock Text="记录人数" Style="{StaticResource StatLabelStyle}"/>
+                </StackPanel>
+            </Border>
+        </UniformGrid>
+
+        <!-- 主内容区 -->
+        <Grid Grid.Row="2" Margin="12,0,12,12">
             <Grid.ColumnDefinitions>
-                <ColumnDefinition Width="400"/>
+                <ColumnDefinition Width="360"/>
                 <ColumnDefinition Width="*"/>
             </Grid.ColumnDefinitions>
-            
-            <Border Grid.Column="0" BorderBrush="#FFCCCCCC" BorderThickness="1" Margin="0,0,10,0">
+
+            <!-- 左侧录入表单 -->
+            <Border Grid.Column="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,8,0">
                 <ScrollViewer VerticalScrollBarVisibility="Auto">
-                    <StackPanel Margin="10">
-                        <TextBlock Text="添加授权记录" FontWeight="Bold" FontSize="14" Margin="0,0,0,10"/>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="记录时间:" VerticalAlignment="Center"/>
-                            <DatePicker x:Name="RecordDatePicker" SelectedDate="{x:Static System:DateTime.Now}"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                <TextBlock Text="时间:" VerticalAlignment="Center" Width="40"/>
-                                <TextBox x:Name="RecordTimeText" Text="" Width="100"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="部门:" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="DepartmentCombo" SelectedIndex="0">
-                                <ComboBoxItem>软件</ComboBoxItem>
-                                <ComboBoxItem>售前</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="记录人:" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="OperatorCombo" SelectedIndex="0">
-                                <ComboBoxItem>彭耀东</ComboBoxItem>
-                                <ComboBoxItem>欧阳键峰</ComboBoxItem>
-                                <ComboBoxItem>李珂</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="申请人:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="ApplicantText" Text=""/>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="设备类型:" VerticalAlignment="Center"/>
-                            <ComboBox x:Name="DeviceTypeCombo" SelectedIndex="0" SelectionChanged="DeviceTypeCombo_SelectionChanged">
-                                <ComboBoxItem>高速贴片机</ComboBoxItem>
-                                <ComboBoxItem>猎奇耦合测试机</ComboBoxItem>
-                                <ComboBoxItem>飞泰耦合测试机</ComboBoxItem>
-                                <ComboBoxItem>芯片测试机</ComboBoxItem>
-                                <ComboBoxItem>个人电脑</ComboBoxItem>
-                                <ComboBoxItem>共晶/固晶</ComboBoxItem>
-                            </ComboBox>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="项目号:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="ProjectNumberText" Text=""/>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="设备号:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="DeviceNumberText" Text=""/>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="机器码文件:" VerticalAlignment="Center"/>
-                            <TextBox x:Name="MachineCodeText" Text="" AllowDrop="True" Background="#FFF0F0F0" Height="80" TextWrapping="Wrap" PreviewDragOver="TextBox_PreviewDragOver" Drop="MachineCodeText_Drop"/>
-                            <TextBlock Text="(支持拖放文件或粘贴文本)" FontSize="10" Foreground="Gray" Margin="0,1,0,0"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                <Button x:Name="ImportMachineCodeBtn" Content="导入..." Width="60" Margin="0,0,5,0" Click="ImportMachineCodeBtn_Click"/>
-                                <Button x:Name="ViewMachineCodeBtn" Content="查看" Width="50" Click="ViewMachineCodeBtn_Click"/>
-                                <Button x:Name="ClearMachineCodeBtn" Content="清空" Width="50" Margin="0,0,5,0" Click="ClearMachineCodeBtn_Click"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <StackPanel Margin="0,5">
-                            <TextBlock Text="授权工具:" VerticalAlignment="Center"/>
-                            <StackPanel Orientation="Horizontal" Margin="0,2,0,0">
-                                <Button x:Name="OpenLicenseToolBtn" Content="打开授权软件" Width="100" Click="OpenLicenseToolBtn_Click"/>
-                            </StackPanel>
-                        </StackPanel>
-                        
-                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center" Margin="0,15,0,0">
-                            <Button x:Name="SaveBtn" Content="保存记录" Width="90" Margin="5,0" Click="SaveBtn_Click" Background="#FF4CAF50" Foreground="White"/>
-                            <Button x:Name="ClearBtn" Content="清空表单" Width="90" Margin="5,0" Click="ClearBtn_Click"/>
+                    <StackPanel>
+                        <TextBlock Text="新增授权记录" FontSize="15" FontWeight="Bold" Margin="0,0,0,12"/>
+
+                        <TextBlock Text="记录时间" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <DatePicker SelectedDate="{Binding FormRecordTime}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="部门" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <ComboBox ItemsSource="{Binding DepartmentOptions}" 
+                                  SelectedItem="{Binding FormDepartment}" 
+                                  IsEditable="True" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="记录人" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <ComboBox ItemsSource="{Binding OperatorOptions}" 
+                                  SelectedItem="{Binding FormOperatorName}" 
+                                  IsEditable="True" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="申请人" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding FormApplicant}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="项目号" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding FormProjectNumber}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="设备号" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding FormDeviceNumber}" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="设备类型" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <ComboBox ItemsSource="{Binding DeviceTypeOptions}" 
+                                  SelectedItem="{Binding FormDeviceType}" 
+                                  IsEditable="True" Margin="0,0,0,8"/>
+
+                        <TextBlock Text="机器码" FontSize="11" Foreground="#FF888888" Margin="0,0,0,2"/>
+                        <TextBox Text="{Binding FormMachineCode}" 
+                                 Height="60" TextWrapping="Wrap" 
+                                 AcceptsReturn="True" VerticalScrollBarVisibility="Auto"
+                                 Margin="0,0,0,12"/>
+
+                        <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                            <Button Content="保存记录" Command="{Binding SaveCommand}" Padding="20,6"/>
+                            <Button Content="清空表单" Command="{Binding ClearFormCommand}" 
+                                    Style="{StaticResource SecondaryButtonStyle}" Padding="20,6"/>
                         </StackPanel>
                     </StackPanel>
                 </ScrollViewer>
             </Border>
-            
-            <Border Grid.Column="1" BorderBrush="#FFCCCCCC" BorderThickness="1">
-                <Grid>
-                    <Grid.RowDefinitions>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="Auto"/>
-                        <RowDefinition Height="*"/>
-                    </Grid.RowDefinitions>
-                    
-                    <TextBlock Grid.Row="0" Text="授权记录列表" FontWeight="Bold" FontSize="14" 
-                               Margin="10,5" HorizontalAlignment="Center"/>
-                    
-                    <StackPanel Grid.Row="1" Orientation="Horizontal" Margin="10,5">
-                        <TextBlock Text="搜索:" VerticalAlignment="Center" Margin="0,0,5,0"/>
-                        <TextBox x:Name="SearchText" Width="150" Margin="0,0,5,0" ToolTip="项目号/设备号"/>
-                        <ComboBox x:Name="SearchDeviceTypeCombo" Width="120" Margin="0,0,5,0" SelectedIndex="0">
-                            <ComboBoxItem>全部设备</ComboBoxItem>
-                            <ComboBoxItem>高速贴片机</ComboBoxItem>
-                            <ComboBoxItem>猎奇耦合测试机</ComboBoxItem>
-                            <ComboBoxItem>飞泰耦合测试机</ComboBoxItem>
-                            <ComboBoxItem>芯片测试机</ComboBoxItem>
-                            <ComboBoxItem>个人电脑</ComboBoxItem>
-                            <ComboBoxItem>共晶/固晶</ComboBoxItem>
-                        </ComboBox>
-                        <Button x:Name="SearchBtn" Content="搜索" Width="60" Margin="0,0,5,0" Click="SearchBtn_Click"/>
-                        <Button x:Name="RefreshBtn" Content="刷新" Width="60" Click="RefreshBtn_Click"/>
-                    </StackPanel>
-                    
-                    <DataGrid Grid.Row="2" x:Name="LicenseRecordGrid" AutoGenerateColumns="False" 
-                              IsReadOnly="True" Margin="5" CanUserAddRows="False"
-                              SelectionMode="Single" SelectionChanged="LicenseRecordGrid_SelectionChanged"
-                              BeginningEdit="LicenseRecordGrid_BeginningEdit">
+
+            <!-- 右侧列表区 -->
+            <Grid Grid.Column="1">
+                <Grid.RowDefinitions>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="Auto"/>
+                    <RowDefinition Height="*"/>
+                    <RowDefinition Height="Auto"/>
+                </Grid.RowDefinitions>
+
+                <!-- 搜索栏 -->
+                <Border Grid.Row="0" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                    <Grid>
+                        <Grid.RowDefinitions>
+                            <RowDefinition Height="Auto"/>
+                            <RowDefinition Height="Auto"/>
+                        </Grid.RowDefinitions>
+
+                        <WrapPanel Grid.Row="0" Orientation="Horizontal">
+                            <TextBox Text="{Binding SearchKeyword, UpdateSourceTrigger=PropertyChanged}" 
+                                     Width="200" Margin="2" VerticalContentAlignment="Center"
+                                     ToolTip="支持项目号/设备号/申请人/记录人/部门模糊搜索"/>
+                            <DatePicker SelectedDate="{Binding FilterStartDate}" Margin="2" ToolTip="开始日期"/>
+                            <TextBlock Text="~" VerticalAlignment="Center" Margin="2"/>
+                            <DatePicker SelectedDate="{Binding FilterEndDate}" Margin="2" ToolTip="结束日期"/>
+                            <ComboBox ItemsSource="{Binding DepartmentOptions}" 
+                                      SelectedItem="{Binding FilterDepartment}" 
+                                      Width="100" Margin="2" ToolTip="部门筛选"/>
+                            <ComboBox ItemsSource="{Binding OperatorOptions}" 
+                                      SelectedItem="{Binding FilterOperator}" 
+                                      Width="100" Margin="2" ToolTip="记录人筛选"/>
+                            <ComboBox ItemsSource="{Binding DeviceTypeOptions}" 
+                                      SelectedItem="{Binding FilterDeviceType}" 
+                                      Width="120" Margin="2" ToolTip="设备类型筛选"/>
+                        </WrapPanel>
+
+                        <WrapPanel Grid.Row="1" Orientation="Horizontal" Margin="0,6,0,0">
+                            <Button Content="搜索" Command="{Binding SearchCommand}" Padding="14,4"/>
+                            <Button Content="重置" Command="{Binding ResetFilterCommand}" 
+                                    Style="{StaticResource SecondaryButtonStyle}" Padding="14,4"/>
+                            <Button Content="批量删除" Command="{Binding BatchDeleteCommand}" 
+                                    Background="#FFF44336" Padding="14,4"
+                                    Visibility="{Binding HasSelection, Converter={StaticResource BoolToVis}}"/>
+                            <TextBlock Text="{Binding PaginationText}" VerticalAlignment="Center" 
+                                       Margin="12,0,0,0" Foreground="#FF888888" FontSize="12"/>
+                        </WrapPanel>
+                    </Grid>
+                </Border>
+
+                <!-- DataGrid -->
+                <Border Grid.Row="1" Grid.RowSpan="2" Style="{StaticResource CardBorderStyle}" Margin="0,0,0,8">
+                    <DataGrid ItemsSource="{Binding Records}" 
+                              AutoGenerateColumns="False"
+                              IsReadOnly="True"
+                              GridLinesVisibility="Horizontal"
+                              BorderThickness="0"
+                              HeadersVisibility="Column"
+                              CanUserAddRows="False"
+                              CanUserDeleteRows="False"
+                              CanUserReorderColumns="False"
+                              CanUserResizeRows="False"
+                              AlternatingRowBackground="#FFF8F8F8"
+                              RowHeaderWidth="0"
+                              SelectionMode="Extended">
                         <DataGrid.Columns>
-                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50" IsReadOnly="True"/>
-                            <DataGridTextColumn Header="记录时间" Binding="{Binding RecordTime, StringFormat=yyyy-MM-dd HH:mm}" Width="120"/>
-                            <DataGridTextColumn Header="部门" Binding="{Binding Department}" Width="80"/>
-                            <DataGridTextColumn Header="记录人" Binding="{Binding Operator}" Width="80"/>
-                            <DataGridTextColumn Header="申请人" Binding="{Binding Applicant}" Width="80"/>
-                            <DataGridTextColumn Header="项目号" Binding="{Binding ProjectNumber}" Width="120"/>
-                            <DataGridTextColumn Header="设备类型" Binding="{Binding DeviceType}" Width="80"/>
-                            <DataGridTextColumn Header="机器码" Binding="{Binding MachineCodeShort}" Width="80" IsReadOnly="True"/>
-                            <DataGridTemplateColumn Header="操作" Width="170">
+                            <DataGridCheckBoxColumn Header="" Binding="{Binding IsSelected, Mode=TwoWay, UpdateSourceTrigger=PropertyChanged}" Width="36">
+                                <DataGridCheckBoxColumn.ElementStyle>
+                                    <Style TargetType="CheckBox">
+                                        <Setter Property="HorizontalAlignment" Value="Center"/>
+                                        <Setter Property="VerticalAlignment" Value="Center"/>
+                                    </Style>
+                                </DataGridCheckBoxColumn.ElementStyle>
+                            </DataGridCheckBoxColumn>
+                            <DataGridTextColumn Header="ID" Binding="{Binding Id}" Width="50"/>
+                            <DataGridTextColumn Header="记录时间" Binding="{Binding RecordTimeText}" Width="120"/>
+                            <DataGridTextColumn Header="部门" Binding="{Binding Department}" Width="70"/>
+                            <DataGridTextColumn Header="记录人" Binding="{Binding OperatorName}" Width="80"/>
+                            <DataGridTextColumn Header="申请人" Binding="{Binding Applicant}" Width="100"/>
+                            <DataGridTextColumn Header="项目号" Binding="{Binding ProjectNumber}" Width="100"/>
+                            <DataGridTextColumn Header="设备号" Binding="{Binding DeviceNumber}" Width="100"/>
+                            <DataGridTextColumn Header="设备类型" Binding="{Binding DeviceType}" Width="90"/>
+                            <DataGridTextColumn Header="机器码" Binding="{Binding MachineCodeShort}" Width="160"/>
+                            <DataGridTemplateColumn Header="操作" Width="120">
                                 <DataGridTemplateColumn.CellTemplate>
                                     <DataTemplate>
                                         <StackPanel Orientation="Horizontal">
-                                            <Button Content="编辑" Width="45" Margin="2" Click="EditRecordBtn_Click" Tag="{Binding Id}"
-                                                    Visibility="{Binding IsEditing, Converter={StaticResource InverseBoolToVisibilityConverter}}"/>
-                                            <Button Content="保存" Width="45" Margin="2" Click="SaveEditBtn_Click" Tag="{Binding Id}"
-                                                    Visibility="{Binding IsEditing, Converter={StaticResource BoolToVisibilityConverter}}"
-                                                    Background="#FF4CAF50" Foreground="White"/>
-                                            <Button Content="导出" Width="45" Margin="2" Click="ExportRecordBtn_Click" Tag="{Binding Id}"/>
-                                            <Button Content="删除" Width="45" Margin="2" Click="DeleteRecordBtn_Click" Tag="{Binding Id}"/>
+                                            <Button Content="详情" Click="DetailButton_Click"
+                                                    Style="{StaticResource SecondaryButtonStyle}" 
+                                                    Padding="8,2" FontSize="11" Margin="1"/>
+                                            <Button Content="删除" Click="DeleteButton_Click"
+                                                    Background="#FFF44336" Padding="8,2" 
+                                                    FontSize="11" Margin="1"/>
                                         </StackPanel>
                                     </DataTemplate>
                                 </DataGridTemplateColumn.CellTemplate>
                             </DataGridTemplateColumn>
                         </DataGrid.Columns>
                     </DataGrid>
-                </Grid>
-            </Border>
-        </Grid>
-        
-        <Border Grid.Row="2" BorderBrush="#FFCCCCCC" BorderThickness="1" Margin="10,0,10,10">
-            <Grid>
-                <Grid.RowDefinitions>
-                    <RowDefinition Height="Auto"/>
-                    <RowDefinition Height="*"/>
-                </Grid.RowDefinitions>
-                <StackPanel Grid.Row="0" Orientation="Horizontal" Background="#FFF0F0F0" Margin="5">
-                    <TextBlock Text="操作日志" FontWeight="Bold" VerticalAlignment="Center"/>
-                    <Button x:Name="ClearLogBtn" Content="清空" Width="60" Margin="10,0,0,0" Click="ClearLogBtn_Click"/>
-                    <Button x:Name="ExportLogBtn" Content="导出日志" Width="70" Margin="10,0,0,0" Click="ExportLogBtn_Click"/>
-                </StackPanel>
-                <TextBox Grid.Row="1" x:Name="LogTextBox" IsReadOnly="True" 
-                         VerticalScrollBarVisibility="Auto" HorizontalScrollBarVisibility="Auto"
-                         FontFamily="Consolas" FontSize="12" TextWrapping="Wrap"/>
+                </Border>
+
+                <!-- 空数据提示 -->
+                <Border Grid.Row="1" Grid.RowSpan="2" 
+                        Style="{StaticResource CardBorderStyle}" 
+                        Visibility="{Binding Records.Count, Converter={StaticResource InvBoolToVis}}"
+                        HorizontalAlignment="Stretch" VerticalAlignment="Stretch"
+                        Margin="0,0,0,8">
+                    <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                        <TextBlock Text="📋" FontSize="48" HorizontalAlignment="Center"/>
+                        <TextBlock Text="暂无记录" FontSize="16" Foreground="#FF888888" 
+                                   HorizontalAlignment="Center" Margin="0,8,0,0"/>
+                        <TextBlock Text="请调整搜索条件或添加新记录" FontSize="12" 
+                                   Foreground="#FFAAAAAA" HorizontalAlignment="Center" Margin="0,4,0,0"/>
+                    </StackPanel>
+                </Border>
+
+                <!-- 分页栏 -->
+                <Border Grid.Row="3" Style="{StaticResource CardBorderStyle}" Padding="10,6">
+                    <StackPanel Orientation="Horizontal" HorizontalAlignment="Center">
+                        <Button Content="上一页" Command="{Binding PreviousPageCommand}" Padding="12,4"/>
+                        <TextBlock Text="{Binding PaginationText}" VerticalAlignment="Center" 
+                                   Margin="16,0" FontSize="12" Foreground="#FF666666"/>
+                        <Button Content="下一页" Command="{Binding NextPageCommand}" Padding="12,4"/>
+                    </StackPanel>
+                </Border>
             </Grid>
+        </Grid>
+
+        <!-- Loading 遮罩 -->
+        <Border Grid.Row="0" Grid.RowSpan="3" Background="#88FFFFFF" 
+                Visibility="{Binding IsLoading, Converter={StaticResource BoolToVis}}"
+                Panel.ZIndex="100">
+            <StackPanel HorizontalAlignment="Center" VerticalAlignment="Center">
+                <ProgressBar IsIndeterminate="True" Width="120" Height="4" 
+                             Background="#FFE0E0E0" Foreground="#FF2196F3" BorderThickness="0"/>
+                <TextBlock Text="正在加载..." FontSize="13" Foreground="#FF666666" 
+                           HorizontalAlignment="Center" Margin="0,10,0,0"/>
+            </StackPanel>
         </Border>
     </Grid>
 </Window>

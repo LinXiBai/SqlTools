@@ -272,6 +272,11 @@ namespace CoreToolkit.StateMachine.Core
         public string ErrorMessage { get; private set; }
         
         /// <summary>
+        /// 异常对象（完整异常信息）
+        /// </summary>
+        public Exception Exception { get; private set; }
+        
+        /// <summary>
         /// 模块列表
         /// </summary>
         public IReadOnlyList<IFlowModule> Modules => _modules;
@@ -348,6 +353,7 @@ namespace CoreToolkit.StateMachine.Core
                 StartTime = DateTime.Now;
                 _executionTimer.Restart();
                 ErrorMessage = null;
+                Exception = null;
 
                 // 重置所有模块
                 ResetAllModules();
@@ -367,6 +373,7 @@ namespace CoreToolkit.StateMachine.Core
                 {
                     Status = StateMachineStatus.Error;
                     ErrorMessage = _rootModule.Statistics.ErrorMessage;
+                    Exception = _rootModule.Statistics.Exception;
                 }
 
                 return success;
@@ -380,12 +387,32 @@ namespace CoreToolkit.StateMachine.Core
             {
                 Status = StateMachineStatus.Error;
                 ErrorMessage = ex.Message;
+                Exception = ex;
                 return false;
             }
             finally
             {
                 _executionTimer.Stop();
             }
+        }
+
+        /// <summary>
+        /// 异步停止状态机并等待清理完成
+        /// </summary>
+        public async Task StopAsync(TimeSpan timeout = default)
+        {
+            if (Status != StateMachineStatus.Running && Status != StateMachineStatus.Paused)
+                return;
+
+            _cts?.Cancel();
+            _rootModule?.Cancel();
+            Status = StateMachineStatus.Stopping;
+
+            // 给模块一些时间完成清理
+            var delay = timeout == default ? TimeSpan.FromSeconds(3) : timeout;
+            await Task.Delay(delay);
+
+            Status = StateMachineStatus.Idle;
         }
 
         /// <summary>
