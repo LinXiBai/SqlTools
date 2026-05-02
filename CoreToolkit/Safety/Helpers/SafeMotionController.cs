@@ -41,9 +41,21 @@ namespace CoreToolkit.Safety.Helpers
         public InterlockEngine InterlockEngine => _interlockEngine;
 
         /// <summary>
-        /// 是否启用安全检查（调试用，可临时关闭）
+        /// 是否启用安全检查。Debug 构建下可临时设为 false 便于联调；Release 构建下始终为 true，禁止关闭。
         /// </summary>
+#if DEBUG
         public bool SafetyEnabled { get; set; } = true;
+#else
+        public bool SafetyEnabled
+        {
+            get { return true; }
+            set
+            {
+                if (!value)
+                    throw new InvalidOperationException("Release 构建禁止关闭安全防护（SafeMotionController.SafetyEnabled）。");
+            }
+        }
+#endif
 
         /// <summary>
         /// 底层运动卡

@@ -303,6 +303,7 @@ namespace CoreToolkit.UnitTests
             _mockMotionCard.Verify(m => m.MoveAbsolute(It.IsAny<int>(), It.IsAny<double>(), It.IsAny<double>()), Times.Never);
         }
 
+#if DEBUG
         [Fact]
         public void MoveAbsoluteSafe_WhenSafetyDisabled_ShouldSkipChecks()
         {
@@ -325,6 +326,7 @@ namespace CoreToolkit.UnitTests
             // Assert
             Assert.True(result.IsSuccess);
         }
+#endif
 
         #endregion
 

@@ -26,6 +26,11 @@ namespace CoreToolkit.Data
         }
 
         /// <summary>
+        /// 为 true 时向控制台输出数据库操作跟踪。默认 false，避免类库污染宿主控制台；需要诊断时再开启。
+        /// </summary>
+        public static bool EnableDatabaseOperationConsoleTrace { get; set; }
+
+        /// <summary>
         /// 表名（默认使用类名的复数形式）
         /// </summary>
         protected virtual string TableName
@@ -884,8 +889,9 @@ namespace CoreToolkit.Data
                     entry = $"[{timestamp}] [Database] [{entityType}] {operationType} 操作: 影响行数 = {affectedRows}";
                     break;
             }
-            
-            Console.WriteLine(entry);
+
+            if (EnableDatabaseOperationConsoleTrace)
+                Console.WriteLine(entry);
         }
 
         /// <summary>

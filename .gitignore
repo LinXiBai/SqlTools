@@ -39,6 +39,10 @@ logs/
 ## Cache
 *.cache
 
+## Python
+__pycache__/
+*.pyc
+
 ## DLL / EXE (build output)
 *.dll
 *.exe

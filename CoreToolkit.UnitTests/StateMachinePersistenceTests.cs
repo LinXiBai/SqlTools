@@ -179,6 +179,7 @@ namespace CoreToolkit.UnitTests
 
             // Act
             bool success = await manager.StartMachineAsync("PersistTest");
+            manager.WaitForPersistenceFlush();
             var records = _repository.GetByMachineName("PersistTest").ToList();
 
             // Assert
@@ -209,6 +210,7 @@ namespace CoreToolkit.UnitTests
 
             // Act
             bool success = await manager.StartMachineAsync("PersistErrorTest");
+            manager.WaitForPersistenceFlush();
             var records = _repository.GetByMachineName("PersistErrorTest").ToList();
 
             // Assert
@@ -287,6 +289,7 @@ namespace CoreToolkit.UnitTests
 
             // Act - 首次执行，Step2 失败
             var result1 = await manager.StartMachineAsync(machineName);
+            manager.WaitForPersistenceFlush();
 
             // Assert - 首次执行
             Assert.False(result1);
@@ -305,6 +308,7 @@ namespace CoreToolkit.UnitTests
 
             // Act - 从最近 Error 记录恢复执行
             var result2 = await manager.RestoreMachineAsync(machineName);
+            manager.WaitForPersistenceFlush();
 
             // Assert - 恢复执行，应从 Step2 继续
             Assert.True(result2);

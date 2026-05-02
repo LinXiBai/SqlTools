@@ -23,6 +23,9 @@ namespace CoreToolkit.StateMachine.Core
         private readonly ConcurrentDictionary<string, FlowStatistics> _statistics 
             = new ConcurrentDictionary<string, FlowStatistics>();
         private readonly StateMachineRecordRepository _recordRepository;
+        private readonly BlockingCollection<StateMachineRecord> _persistQueue;
+        private readonly Task _persistTask;
+        private int _persistInFlight;
         private bool _disposed = false;
 
         /// <summary>
@@ -37,6 +40,9 @@ namespace CoreToolkit.StateMachine.Core
         public StateMachineManager(StateMachineRecordRepository recordRepository)
         {
             _recordRepository = recordRepository;
+
+            _persistQueue = new BlockingCollection<StateMachineRecord>(boundedCapacity: 1024);
+            _persistTask = Task.Run((Action)PersistLoop);
         }
 
         /// <summary>全局默认超时时间(毫秒)</summary>
@@ -254,6 +260,34 @@ namespace CoreToolkit.StateMachine.Core
             };
         }
 
+        /// <summary>
+        /// 等待后台持久化队列与进行中的写入完成，便于测试或退出前从数据库读到最新记录。
+        /// </summary>
+        public void WaitForPersistenceFlush(TimeSpan? timeout = null)
+        {
+            if (_persistQueue == null)
+                return;
+
+            var max = timeout ?? TimeSpan.FromSeconds(30);
+            var sw = Stopwatch.StartNew();
+            var stableIdleTicks = 0;
+            while (sw.Elapsed < max)
+            {
+                if (_persistQueue.Count == 0 && Volatile.Read(ref _persistInFlight) == 0)
+                {
+                    stableIdleTicks++;
+                    if (stableIdleTicks >= 20)
+                        return;
+                }
+                else
+                {
+                    stableIdleTicks = 0;
+                }
+
+                Thread.Sleep(5);
+            }
+        }
+
         private void SaveStatistics(StateMachine machine)
         {
             var stats = new FlowStatistics
@@ -292,13 +326,81 @@ namespace CoreToolkit.StateMachine.Core
                         UpdatedAt = DateTime.Now
                     };
 
-                    _recordRepository.Insert(record);
+                    // 通过后台队列持久化，避免阻塞状态机线程
+                    TryEnqueueRecord(record);
                 }
                 catch (Exception ex)
                 {
                     // 持久化失败不应影响主流程，记录到调试输出
                     System.Diagnostics.Debug.WriteLine($"[StateMachineManager] 持久化状态机记录失败: {ex.Message}");
                 }
+            }
+        }
+
+        private void TryEnqueueRecord(StateMachineRecord record)
+        {
+            if (record == null) return;
+            if (_persistQueue == null || _persistQueue.IsAddingCompleted)
+                return;
+
+            // 队列满时不阻塞调用方：异步降级写入，避免丢记录
+            if (!_persistQueue.TryAdd(record))
+            {
+                System.Diagnostics.Debug.WriteLine("[StateMachineManager] 持久化队列已满，已降级为异步写入。");
+                Task.Run(() =>
+                {
+                    Interlocked.Increment(ref _persistInFlight);
+                    try
+                    {
+                        try
+                        {
+                            _recordRepository.Insert(record);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[StateMachineManager] 降级持久化失败: {ex.Message}");
+                        }
+                    }
+                    finally
+                    {
+                        Interlocked.Decrement(ref _persistInFlight);
+                    }
+                });
+            }
+        }
+
+        private void PersistLoop()
+        {
+            if (_recordRepository == null || _persistQueue == null) return;
+
+            try
+            {
+                foreach (var record in _persistQueue.GetConsumingEnumerable())
+                {
+                    Interlocked.Increment(ref _persistInFlight);
+                    try
+                    {
+                        try
+                        {
+                            _recordRepository.Insert(record);
+                        }
+                        catch (Exception ex)
+                        {
+                            System.Diagnostics.Debug.WriteLine($"[StateMachineManager] 后台持久化失败: {ex.Message}");
+                        }
+                    }
+                    finally
+                    {
+                        Interlocked.Decrement(ref _persistInFlight);
+                    }
+                }
+            }
+            catch (OperationCanceledException)
+            {
+            }
+            catch (Exception ex)
+            {
+                System.Diagnostics.Debug.WriteLine($"[StateMachineManager] 持久化线程异常: {ex.Message}");
             }
         }
 
@@ -309,6 +411,26 @@ namespace CoreToolkit.StateMachine.Core
             StopAllMachines();
             _machines.Clear();
             _statistics.Clear();
+
+            if (_persistQueue != null)
+            {
+                try
+                {
+                    _persistQueue.CompleteAdding();
+                }
+                catch { }
+            }
+            try
+            {
+                _persistTask?.Wait(TimeSpan.FromSeconds(10));
+            }
+            catch { }
+            try
+            {
+                _persistQueue?.Dispose();
+            }
+            catch { }
+
             _disposed = true;
         }
     }

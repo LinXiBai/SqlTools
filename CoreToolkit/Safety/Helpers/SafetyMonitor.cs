@@ -120,9 +120,10 @@ namespace CoreToolkit.Safety.Helpers
                     }
 
                     // 3. 互锁评估
+                    InterlockEvaluationResult interlockResult = null;
                     if (_interlockEngine != null)
                     {
-                        var interlockResult = _interlockEngine.EvaluateAll();
+                        interlockResult = _interlockEngine.EvaluateAll();
                         if (!interlockResult.IsSafe)
                         {
                             HandleInterlock(interlockResult);
@@ -131,7 +132,7 @@ namespace CoreToolkit.Safety.Helpers
 
                     // 4. 更新总体安全状态
                     bool nowSafe = collisionResult.IsSafe &&
-                                   (_interlockEngine == null || _interlockEngine.EvaluateAll().IsSafe);
+                                   (_interlockEngine == null || (interlockResult?.IsSafe ?? true));
 
                     if (nowSafe != IsCurrentlySafe)
                     {
